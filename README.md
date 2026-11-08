@@ -38,6 +38,35 @@ Base pública real → limpeza e EDA → Estatística → Árvore de Decisão ×
 
 Todo mundo participa de todas as entregas. Cada pasta tem um README com o que o enunciado pede. Tarefas e prazos ficam no [Trello](https://trello.com/b/yPiOGJUF/zela-gs-20262).
 
+## Como trabalhamos
+
+O Trello mostra quem vai fazer o quê. O GitHub mostra quem fez.
+
+**No Trello**
+- Entre como membro nos cartões em que você vai mexer.
+- Coloque seu nome no item da checklist que você pegou, por exemplo `Trigger (Nai)`.
+- Começou: puxe o cartão para **Fazendo**. Terminou: mande para **Revisão**, e outra pessoa confere antes de ir para **Feito**.
+- Travou? Comente no cartão, não só no WhatsApp.
+
+**No GitHub**
+- Cada um commita da própria conta, na pasta da matéria.
+- Comece a mensagem com a sigla da matéria e diga o que mudou:
+
+| Sigla | Matéria | Exemplo |
+|---|---|---|
+| `[SENS]` | Sensores | `[SENS] adiciona leitura do potenciômetro de SpO2` |
+| `[PY]` | Python | `[PY] cria classe Leitura com os 3 níveis` |
+| `[CYBER]` | Cyber Security | `[CYBER] valida CSV adulterado` |
+| `[BD]` | Banco de Dados | `[BD] cria trigger de alerta` |
+| `[AWS]` | AWS | `[AWS] Lambda grava o CSV no RDS` |
+| `[EST]` | Estatística | `[EST] tabela de frequência da SpO2` |
+| `[ML]` | Machine Learning | `[ML] separa treino e teste` |
+| `[RN]` | Redes Neurais | `[RN] compara 2 configurações da MLP` |
+| `[AIC]` | AI Challenges | `[AIC] roteiro do vídeo` |
+| `[DOC]` | Documentação | `[DOC] atualiza a arquitetura` |
+
+- Dê `git pull` antes de começar, para não sobrescrever o trabalho de ninguém.
+
 ## Regras do repositório
 
 - Nada de `.env`, chave da AWS ou senha do banco no git. Use variáveis de ambiente.
