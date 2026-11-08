@@ -1,8 +1,5 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="Documentacao/marca/zela-logo-escuro.svg">
-    <img src="Documentacao/marca/zela-logo-claro.svg" alt="Zela" width="280">
-  </picture>
+  <img src="Documentacao/marca/zela-banner.png" alt="Zela" width="360">
 </p>
 
 <p align="center"><b>Pulseira de monitoramento para quem espera no pronto-socorro.</b></p>
