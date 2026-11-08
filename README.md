@@ -44,9 +44,7 @@ O Trello mostra quem vai fazer o quê. O GitHub mostra quem fez.
 
 **No Trello**
 - Entre como membro nos cartões em que você vai mexer.
-- Coloque seu nome no item da checklist que você pegou, por exemplo `Trigger (Nai)`.
 - Começou: puxe o cartão para **Fazendo**. Terminou: mande para **Revisão**, e outra pessoa confere antes de ir para **Feito**.
-- Travou? Comente no cartão, não só no WhatsApp.
 
 **No GitHub**
 - Cada um commita da própria conta, na pasta da matéria.
