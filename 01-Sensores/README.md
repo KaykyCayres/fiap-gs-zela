@@ -1,7 +1,5 @@
 # AI Computer Systems & Sensors
 
-**Responsável:** Rafa
-
 O que o enunciado pede:
 
 - [ ] ESP32 físico ou no Wokwi

@@ -1,7 +1,5 @@
 # Redes Neurais Artificiais
 
-**Responsável:** Kayky
-
 O que o enunciado pede:
 
 - [ ] MLP com StandardScaler ajustado só no treino

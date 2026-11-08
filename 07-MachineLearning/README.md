@@ -1,7 +1,5 @@
 # Machine Learning & Modelling
 
-**Responsável:** Kayky
-
 O que o enunciado pede:
 
 - [ ] EDA, treino e teste, pré-processamento

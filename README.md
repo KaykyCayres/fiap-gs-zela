@@ -23,20 +23,20 @@ Base pública real → limpeza e EDA → Estatística → Árvore de Decisão ×
 
 ## Pastas
 
-| Pasta | Matéria | Responsável |
-|---|---|---|
-| [01-Sensores](01-Sensores) | AI Computer Systems & Sensors | Rafa |
-| [02-Python](02-Python) | Computational Thinking with Python | Rafa |
-| [03-CyberSecurity](03-CyberSecurity) | Cognitive Cyber Security | Naiara |
-| [04-BancoDados](04-BancoDados) | Banco de Dados | Naiara |
-| [05-AWS](05-AWS) | Cloud Computing AWS | Naiara |
-| [06-Estatistica](06-Estatistica) | Estatística Aplicada | Rafa (EDA com Kayky) |
-| [07-MachineLearning](07-MachineLearning) | Machine Learning & Modelling | Kayky |
-| [08-RedesNeurais](08-RedesNeurais) | Redes Neurais Artificiais | Kayky |
-| [09-AIChallenges](09-AIChallenges) | AI Challenges | Kayky |
-| [Documentacao](Documentacao) | Escopo, arquitetura e marca | Todos |
+| Pasta | Matéria |
+|---|---|
+| [01-Sensores](01-Sensores) | AI Computer Systems & Sensors |
+| [02-Python](02-Python) | Computational Thinking with Python |
+| [03-CyberSecurity](03-CyberSecurity) | Cognitive Cyber Security |
+| [04-BancoDados](04-BancoDados) | Banco de Dados |
+| [05-AWS](05-AWS) | Cloud Computing AWS |
+| [06-Estatistica](06-Estatistica) | Estatística Aplicada |
+| [07-MachineLearning](07-MachineLearning) | Machine Learning & Modelling |
+| [08-RedesNeurais](08-RedesNeurais) | Redes Neurais Artificiais |
+| [09-AIChallenges](09-AIChallenges) | AI Challenges |
+| [Documentacao](Documentacao) | Escopo, arquitetura e marca |
 
-Cada pasta tem um README com o que o enunciado pede. Tarefas e prazos ficam no [Trello](https://trello.com/b/yPiOGJUF/zela-gs-20262).
+Todo mundo participa de todas as entregas. Cada pasta tem um README com o que o enunciado pede. Tarefas e prazos ficam no [Trello](https://trello.com/b/yPiOGJUF/zela-gs-20262).
 
 ## Regras do repositório
 
@@ -46,4 +46,4 @@ Cada pasta tem um README com o que o enunciado pede. Tarefas e prazos ficam no [
 
 ## Equipe
 
-Naiara, Rafa e Kayky.
+Naiara, Rafael e Kayky.

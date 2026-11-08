@@ -1,7 +1,5 @@
 # Cognitive Cyber Security
 
-**Responsável:** Naiara
-
 O que o enunciado pede:
 
 - [ ] 3 riscos com as medidas de cada um

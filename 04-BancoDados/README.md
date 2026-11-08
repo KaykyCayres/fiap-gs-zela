@@ -1,7 +1,5 @@
 # Banco de Dados
 
-**Responsável:** Naiara
-
 O que o enunciado pede:
 
 - [ ] Modelos conceitual, lógico e físico até a 3FN

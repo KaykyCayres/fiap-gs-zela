@@ -1,7 +1,5 @@
 # AI Challenges
 
-**Responsável:** Kayky
-
 O que o enunciado pede:
 
 - [ ] Vídeo de até 7 min no YouTube, não listado

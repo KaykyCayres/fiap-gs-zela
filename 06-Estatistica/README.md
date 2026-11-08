@@ -1,7 +1,5 @@
 # Estatística Aplicada
 
-**Responsável:** Rafa (EDA com Kayky)
-
 O que o enunciado pede:
 
 - [ ] Base real em CSV ou XLSX

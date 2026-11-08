@@ -1,7 +1,5 @@
 # Cloud Computing AWS
 
-**Responsável:** Naiara
-
 O que o enunciado pede:
 
 - [ ] CSV com 5 medições ou mais no S3

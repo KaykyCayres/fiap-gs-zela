@@ -1,7 +1,5 @@
 # Computational Thinking with Python
 
-**Responsável:** Rafa
-
 O que o enunciado pede:
 
 - [ ] 2 entradas
