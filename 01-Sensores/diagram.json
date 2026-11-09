@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "author": "Kayke | Naiara | Rafael - Global Solution - Zela, Pulseira de Monitoramento",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-ds18b20", "id": "temp", "top": -125, "left": -200, "attrs": { "temperature": "36.5" } },
+    { "type": "wokwi-mpu6050", "id": "mpu", "top": 95, "left": -230, "attrs": {} },
+    { "type": "wokwi-led", "id": "ledNormal", "top": -110, "left": 235, "attrs": { "color": "green", "label": "NORMAL" } },
+    { "type": "wokwi-led", "id": "ledAtencao", "top": -35, "left": 235, "attrs": { "color": "yellow", "label": "ATENCAO" } },
+    { "type": "wokwi-led", "id": "ledCritico", "top": 40, "left": 235, "attrs": { "color": "red", "label": "CRITICO" } },
+    { "type": "wokwi-buzzer", "id": "buzzer", "top": 140, "left": 235, "attrs": { "volume": "0.5" } },
+    { "type": "wokwi-resistor", "id": "rTemp", "top": -170, "left": -105, "rotate": 90, "attrs": { "value": "4700" } },
+    { "type": "wokwi-resistor", "id": "rGreen", "top": -95, "left": 155, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "rYellow", "top": -20, "left": 155, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "rRed", "top": 55, "left": 155, "rotate": 90, "attrs": { "value": "220" } }
+  ],
+  "connections": [
+    [ "temp:VCC", "esp:3V3", "red", [] ],
+    [ "temp:GND", "esp:GND.1", "black", [] ],
+    [ "temp:DQ", "esp:D4", "green", [] ],
+    [ "rTemp:1", "temp:DQ", "green", [] ],
+    [ "rTemp:2", "esp:3V3", "red", [] ],
+
+    [ "mpu:VCC", "esp:3V3", "red", [] ],
+    [ "mpu:GND", "esp:GND.1", "black", [] ],
+    [ "mpu:SDA", "esp:D21", "blue", [] ],
+    [ "mpu:SCL", "esp:D22", "purple", [] ],
+
+    [ "esp:D25", "rGreen:1", "green", [] ],
+    [ "rGreen:2", "ledNormal:A", "green", [] ],
+    [ "ledNormal:C", "esp:GND.2", "black", [] ],
+
+    [ "esp:D26", "rYellow:1", "gold", [] ],
+    [ "rYellow:2", "ledAtencao:A", "gold", [] ],
+    [ "ledAtencao:C", "esp:GND.2", "black", [] ],
+
+    [ "esp:D27", "rRed:1", "red", [] ],
+    [ "rRed:2", "ledCritico:A", "red", [] ],
+    [ "ledCritico:C", "esp:GND.2", "black", [] ],
+
+    [ "buzzer:1", "esp:GND.2", "black", [] ],
+    [ "buzzer:2", "esp:D14", "orange", [] ]
+  ],
+  "dependencies": {}
+}
