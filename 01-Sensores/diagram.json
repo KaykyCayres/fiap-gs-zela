@@ -1,11 +1,14 @@
 {
   "version": 1,
-  "author": "Kayke | Naiara | Rafael - Global Solution - Zela, Pulseira de Monitoramento",
+  "author": "Kayky | Naiara | Rafael - Global Solution - Zela, Pulseira de Monitoramento",
   "editor": "wokwi",
   "parts": [
     { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
     { "type": "wokwi-ds18b20", "id": "temp", "top": -125, "left": -200, "attrs": { "temperature": "36.5" } },
     { "type": "wokwi-mpu6050", "id": "mpu", "top": 95, "left": -230, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "potFC", "top": 230, "left": -40, "attrs": { "label": "FC (simulada)" } },
+    { "type": "wokwi-potentiometer", "id": "potSpO2", "top": 230, "left": 60, "attrs": { "label": "SpO2 (simulada)" } },
+    { "type": "wokwi-pushbutton", "id": "botao", "top": 240, "left": 180, "attrs": { "color": "blue", "label": "Chamar enfermagem" } },
     { "type": "wokwi-led", "id": "ledNormal", "top": -110, "left": 235, "attrs": { "color": "green", "label": "NORMAL" } },
     { "type": "wokwi-led", "id": "ledAtencao", "top": -35, "left": 235, "attrs": { "color": "yellow", "label": "ATENCAO" } },
     { "type": "wokwi-led", "id": "ledCritico", "top": 40, "left": 235, "attrs": { "color": "red", "label": "CRITICO" } },
@@ -16,6 +19,9 @@
     { "type": "wokwi-resistor", "id": "rRed", "top": 55, "left": 155, "rotate": 90, "attrs": { "value": "220" } }
   ],
   "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+
     [ "temp:VCC", "esp:3V3", "red", [] ],
     [ "temp:GND", "esp:GND.1", "black", [] ],
     [ "temp:DQ", "esp:D4", "green", [] ],
@@ -26,6 +32,17 @@
     [ "mpu:GND", "esp:GND.1", "black", [] ],
     [ "mpu:SDA", "esp:D21", "blue", [] ],
     [ "mpu:SCL", "esp:D22", "purple", [] ],
+
+    [ "potFC:VCC", "esp:3V3", "red", [] ],
+    [ "potFC:GND", "esp:GND.1", "black", [] ],
+    [ "potFC:SIG", "esp:D34", "orange", [] ],
+
+    [ "potSpO2:VCC", "esp:3V3", "red", [] ],
+    [ "potSpO2:GND", "esp:GND.1", "black", [] ],
+    [ "potSpO2:SIG", "esp:D35", "cyan", [] ],
+
+    [ "botao:1.l", "esp:D33", "blue", [] ],
+    [ "botao:2.l", "esp:GND.2", "black", [] ],
 
     [ "esp:D25", "rGreen:1", "green", [] ],
     [ "rGreen:2", "ledNormal:A", "green", [] ],
