@@ -1,7 +1,7 @@
 """
 ZELA - Pulseira de monitoramento na espera do pronto-socorro
 Global Solution 2026.2 - Cognitive Cyber Security
-Integrantes: Naiara Sousa Soares (RM 574792), Rafael Medici, Kayky Cayres
+Integrantes: Naiara Sousa Soares (RM 574792), Rafael Medici (RM 576249), Kayky Cayres Vicente da Silva (RM 575091)
 
 Protecoes basicas aplicadas ao fluxo da pulseira:
   1. Validacao de entrada  -> recusa valores que nao sao numeros ou impossiveis
@@ -15,7 +15,7 @@ import hashlib
 import os
 
 # Faixas possiveis para o sensor (fora disso a leitura e considerada erro)
-FAIXA_FC = (30, 220)      # batimentos por minuto
+FAIXA_FC = (20, 250)      # batimentos por minuto (mesma faixa do monitor_pulseira.py)
 FAIXA_SPO2 = (50, 100)    # saturacao de oxigenio em %
 
 # Campos que nunca podem aparecer na saida
@@ -37,10 +37,10 @@ def validar_medicao(fc_texto, spo2_texto):
 
 
 def classificar(fc, spo2):
-    """Mesmos 3 niveis usados em AICSS e Python."""
-    if spo2 < 90 or fc > 120:
+    """Mesmas regras do monitor_pulseira.py (Python) e do ESP32 (AICSS)."""
+    if fc >= 130 or spo2 < 90:
         return "CRITICO"
-    if spo2 < 95 or fc > 108:
+    if fc >= 110 or fc < 50 or spo2 < 95:
         return "ATENCAO"
     return "NORMAL"
 

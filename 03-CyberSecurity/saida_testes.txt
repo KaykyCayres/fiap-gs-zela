@@ -3,9 +3,9 @@ TESTE 1 - Entrada invalida (protecao: validacao de entrada)
 ==============================================================
 Entrada FC=  75 SpO2=  98 -> NORMAL
 Entrada FC= abc SpO2=  97 -> RECUSADA - valor nao numerico
-Entrada FC= 900 SpO2=  96 -> RECUSADA - FC 900 fora da faixa (30, 220)
+Entrada FC= 900 SpO2=  96 -> RECUSADA - FC 900 fora da faixa (20, 250)
 Entrada FC=  80 SpO2= 150 -> RECUSADA - SpO2 150 fora da faixa (50, 100)
-Entrada FC=  -5 SpO2=  95 -> RECUSADA - FC -5 fora da faixa (30, 220)
+Entrada FC=  -5 SpO2=  95 -> RECUSADA - FC -5 fora da faixa (20, 250)
 Entrada FC= 135 SpO2=  88 -> CRITICO
 
 ==============================================================
