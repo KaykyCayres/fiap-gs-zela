@@ -1,8 +1,8 @@
 -- =====================================================================
 -- ZELA - Pulseira de monitoramento na espera do pronto-socorro
 -- Global Solution 2026.2 (CitizenTech) - Cognitive Data Science
--- Integrantes: Naiara Sousa Soares (RM 574792), Rafa Medici (RM ______),
---              Kayky Cayres (RM ______)
+-- Integrantes: Naiara Sousa Soares (RM 574792), Rafael Medici (RM 576249),
+--              Kayky Cayres Vicente da Silva (RM 575091)
 -- Adaptacao do case "Fazendas inteligentes":
 --   local (fazenda)  -> Unidade (pronto-socorro / UPA)
 --   sensor           -> Sensor de uma pulseira (FC, SpO2, temperatura)
