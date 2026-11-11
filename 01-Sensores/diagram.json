@@ -3,61 +3,121 @@
   "author": "Kayky | Naiara | Rafael - Global Solution - Zela, Pulseira de Monitoramento",
   "editor": "wokwi",
   "parts": [
-    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
-    { "type": "wokwi-ds18b20", "id": "temp", "top": -125, "left": -200, "attrs": { "temperature": "36.5" } },
-    { "type": "wokwi-mpu6050", "id": "mpu", "top": 95, "left": -230, "attrs": {} },
-    { "type": "wokwi-potentiometer", "id": "potFC", "top": 230, "left": -40, "attrs": { "label": "FC (simulada)" } },
-    { "type": "wokwi-potentiometer", "id": "potSpO2", "top": 230, "left": 60, "attrs": { "label": "SpO2 (simulada)" } },
-    { "type": "wokwi-pushbutton", "id": "botao", "top": 240, "left": 180, "attrs": { "color": "blue", "label": "Chamar enfermagem" } },
-    { "type": "wokwi-led", "id": "ledNormal", "top": -110, "left": 235, "attrs": { "color": "green", "label": "NORMAL" } },
-    { "type": "wokwi-led", "id": "ledAtencao", "top": -35, "left": 235, "attrs": { "color": "yellow", "label": "ATENCAO" } },
-    { "type": "wokwi-led", "id": "ledCritico", "top": 40, "left": 235, "attrs": { "color": "red", "label": "CRITICO" } },
-    { "type": "wokwi-buzzer", "id": "buzzer", "top": 140, "left": 235, "attrs": { "volume": "0.5" } },
-    { "type": "wokwi-resistor", "id": "rTemp", "top": -170, "left": -105, "rotate": 90, "attrs": { "value": "4700" } },
-    { "type": "wokwi-resistor", "id": "rGreen", "top": -95, "left": 155, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-resistor", "id": "rYellow", "top": -20, "left": 155, "rotate": 90, "attrs": { "value": "220" } },
-    { "type": "wokwi-resistor", "id": "rRed", "top": 55, "left": 155, "rotate": 90, "attrs": { "value": "220" } }
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": -288, "left": -167.96, "attrs": {} },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "potSpO2",
+      "top": -385.3,
+      "left": -403.4,
+      "attrs": { "label": "SpO2 (simulada)", "value": "946" }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "potFC",
+      "top": -385.3,
+      "left": -288.2,
+      "attrs": { "label": "FC (simulada)", "value": "281" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "botao",
+      "top": -33,
+      "left": -505,
+      "attrs": { "color": "blue", "xray": "1", "bounce": "0", "label": "Chamar enfermagem" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledNormal",
+      "top": -51.6,
+      "left": -418.6,
+      "attrs": { "color": "green", "label": "NORMAL" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledAtencao",
+      "top": -52,
+      "left": -371.3,
+      "attrs": { "color": "yellow", "label": "ATENCAO" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledCritico",
+      "top": -52,
+      "left": -325.4,
+      "attrs": { "color": "red", "label": "CRITICO" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rGreen",
+      "top": 25.9,
+      "left": -430.8,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rYellow",
+      "top": 25.9,
+      "left": -384.9,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rRed",
+      "top": 24,
+      "left": -336.55,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "buzzer",
+      "top": -64,
+      "left": -280.8,
+      "attrs": { "volume": "0.1" }
+    },
+    { "type": "wokwi-mpu6050", "id": "mpu", "top": -351.38, "left": -7.28, "attrs": {} },
+    { "type": "wokwi-ds18b20", "id": "temp", "top": -183.53, "left": -5.52, "attrs": { "temperature": "36.5" } },
+    {
+      "type": "wokwi-resistor",
+      "id": "rTemp",
+      "top": -112.05,
+      "left": 29,
+      "attrs": { "value": "4700" }
+    }
   ],
   "connections": [
-    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
-    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
-
-    [ "temp:VCC", "esp:3V3", "red", [] ],
-    [ "temp:GND", "esp:GND.1", "black", [] ],
-    [ "temp:DQ", "esp:D4", "green", [] ],
-    [ "rTemp:1", "temp:DQ", "green", [] ],
-    [ "rTemp:2", "esp:3V3", "red", [] ],
-
-    [ "mpu:VCC", "esp:3V3", "red", [] ],
-    [ "mpu:GND", "esp:GND.1", "black", [] ],
-    [ "mpu:SDA", "esp:D21", "blue", [] ],
-    [ "mpu:SCL", "esp:D22", "purple", [] ],
-
-    [ "potFC:VCC", "esp:3V3", "red", [] ],
-    [ "potFC:GND", "esp:GND.1", "black", [] ],
-    [ "potFC:SIG", "esp:D34", "orange", [] ],
-
-    [ "potSpO2:VCC", "esp:3V3", "red", [] ],
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "esp:34", "potFC:SIG", "orange", [] ],
+    [ "esp:35", "potSpO2:SIG", "cyan", [] ],
+    [ "esp:3V3", "potFC:VCC", "red", [ "h-14", "v-28.7" ] ],
+    [ "potSpO2:VCC", "potFC:VCC", "red", [ "v26" ] ],
+    [ "potFC:GND", "potSpO2:GND", "black", [ "v36" ] ],
+    [ "potSpO2:GND", "botao:2.l", "black", [ "v36", "h-140", "v279" ] ],
     [ "potSpO2:GND", "esp:GND.1", "black", [] ],
-    [ "potSpO2:SIG", "esp:D35", "cyan", [] ],
-
-    [ "botao:1.l", "esp:D33", "blue", [] ],
-    [ "botao:2.l", "esp:GND.2", "black", [] ],
-
-    [ "esp:D25", "rGreen:1", "green", [] ],
-    [ "rGreen:2", "ledNormal:A", "green", [] ],
-    [ "ledNormal:C", "esp:GND.2", "black", [] ],
-
-    [ "esp:D26", "rYellow:1", "gold", [] ],
-    [ "rYellow:2", "ledAtencao:A", "gold", [] ],
-    [ "ledAtencao:C", "esp:GND.2", "black", [] ],
-
-    [ "esp:D27", "rRed:1", "red", [] ],
-    [ "rRed:2", "ledCritico:A", "red", [] ],
-    [ "ledCritico:C", "esp:GND.2", "black", [] ],
-
-    [ "buzzer:1", "esp:GND.2", "black", [] ],
-    [ "buzzer:2", "esp:D14", "orange", [] ]
+    [ "esp:33", "botao:1.r", "blue", [ "h-262.9", "v174.1" ] ],
+    [ "esp:25", "ledNormal:A", "green", [ "h-216.1", "v174.5" ] ],
+    [ "ledNormal:C", "rGreen:1", "black", [] ],
+    [ "esp:26", "ledAtencao:A", "gold", [ "h-170.2", "v164.9" ] ],
+    [ "ledAtencao:C", "rYellow:1", "black", [] ],
+    [ "esp:27", "ledCritico:A", "red", [ "h-124.3", "v155.3" ] ],
+    [ "ledCritico:C", "rRed:1", "black", [] ],
+    [ "esp:14", "buzzer:2", "violet", [ "h-34.9", "v175.7" ] ],
+    [ "esp:21", "mpu:SDA", "magenta", [ "h37.7", "v-141.7" ] ],
+    [ "esp:22", "mpu:SCL", "purple", [ "h27.7", "v-119.9" ] ],
+    [ "esp:GND.2", "mpu:GND", "black", [ "h17.7", "v-107.7" ] ],
+    [ "esp:3V3", "mpu:VCC", "red", [ "h-8", "v-114.7" ] ],
+    [ "esp:4", "temp:DQ", "limegreen", [ "h20", "v28.8", "h56.8" ] ],
+    [ "temp:GND", "esp:GND.3", "black", [ "v5", "h-25", "v-67.7" ] ],
+    [ "temp:VCC", "mpu:VCC", "red", [ "v5", "h70.4", "v-255" ] ],
+    [ "rTemp:1", "temp:DQ", "limegreen", [] ],
+    [ "rTemp:2", "temp:VCC", "red", [ "h2.2", "v-8.8", "h-70.8" ] ],
+    [ "buzzer:1", "esp:GND.1", "black", [ "v8.8", "h71.4", "v-163.2" ] ],
+    [ "rRed:2", "esp:GND.1", "black", [ "v18", "h124.8", "v-211.2" ] ],
+    [ "rYellow:2", "esp:GND.1", "black", [ "h0.35", "v35.3", "h172.8", "v-230.4" ] ],
+    [ "rGreen:2", "esp:GND.1", "black", [ "h-1.75", "v54.5", "h220.8", "v-249.6" ] ]
   ],
   "dependencies": {}
 }

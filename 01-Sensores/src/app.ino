@@ -117,12 +117,13 @@ void alertar(String estado) {
   digitalWrite(LED_AMARELO,  estado == "ATENCAO");
   digitalWrite(LED_VERMELHO, estado == "CRITICO");
 
+  // O tone() para sozinho depois do tempo informado, entao no NORMAL
+  // nao precisamos chamar noTone() (chamar antes do primeiro tone gera
+  // o aviso "LEDC is not initialized" no ESP32).
   if (estado == "CRITICO") {
     tone(PINO_BUZZER, 1000, 800);   // bipe longo a cada leitura
   } else if (estado == "ATENCAO") {
     tone(PINO_BUZZER, 600, 150);    // bipe curto a cada leitura
-  } else {
-    noTone(PINO_BUZZER);
   }
 }
 
@@ -178,8 +179,7 @@ void loop() {
     String estado = classificar(fc, spo2, temp, motivo);
     if (pedidoAjuda) motivo += "paciente pediu ajuda; ";
     if (motivo.endsWith("; ")) motivo.remove(motivo.length() - 2);   // tira o ultimo "; "
-    alertar(estado);
-
+    
     // Uma linha por leitura, sempre na mesma ordem
     Serial.print("t="); Serial.print(millis() / 1000); Serial.print("s | ");
     Serial.print("FC="); Serial.print(fc);
@@ -195,5 +195,8 @@ void loop() {
     if (qualidade == "INSTAVEL") {
       Serial.println("   -> Movimento detectado: fique parado para uma leitura confiavel.");
     }
+     // LEDs e buzzer depois de imprimir, para nenhum aviso interno do ESP32
+    // aparecer no meio da linha do Serial
+    alertar(estado);
   }
 }
