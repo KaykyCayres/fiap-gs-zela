@@ -20,6 +20,9 @@ USE zela;
 -- -----------------------------
 -- 1. Tabelas (DDL)
 -- -----------------------------
+-- CHECK: o banco so aceita valores validos (ex.: status ATIVO, MANUTENCAO ou INATIVO)
+-- UNIQUE: impede repeticao (mesma leitura duas vezes / mais de um alerta por medicao)
+-- CHECK (limiteInferior < limiteSuperior): o limite minimo precisa ser menor que o maximo
 CREATE TABLE Unidade (
     idUnidade   INT AUTO_INCREMENT PRIMARY KEY,
     nome        VARCHAR(80)  NOT NULL,
@@ -112,6 +115,8 @@ CREATE TABLE Alerta (
 -- -----------------------------
 -- 2. Trigger: AFTER INSERT na Medicao
 -- -----------------------------
+-- Gera alerta quando a medicao fica abaixo do limite minimo (pedido do enunciado)
+-- e tambem acima do maximo, porque FC ou temperatura alta tambem indicam piora.
 DELIMITER $$
 CREATE TRIGGER trg_alerta_medicao
 AFTER INSERT ON Medicao
@@ -129,11 +134,10 @@ BEGIN
      WHERE S.idSensor = NEW.idSensor;
 
     IF NEW.valor < v_inferior OR NEW.valor > v_superior THEN
-        INSERT INTO Alerta
-           SET idMedicao = NEW.idMedicao, idUnidade = v_idUnidade,
-               idSensor = NEW.idSensor, valor = NEW.valor,
-               limiteInferior = v_inferior, limiteSuperior = v_superior,
-               dtAlerta = NEW.dtMedicao;
+        INSERT INTO Alerta (idMedicao, idUnidade, idSensor, valor,
+                            limiteInferior, limiteSuperior, dtAlerta)
+        VALUES (NEW.idMedicao, v_idUnidade, NEW.idSensor, NEW.valor,
+                v_inferior, v_superior, NEW.dtMedicao);
     END IF;
 END $$
 DELIMITER ;
@@ -243,8 +247,19 @@ INSERT INTO Medicao (idSensor, idAtendimento, valor, dtMedicao, origemDado) VALU
 (18,6,36.12,'2026-11-10 15:35:00','SIMULADO');
 
 -- -----------------------------
--- 4. Consulta: total de sensores e media das medicoes por unidade e sinal
+-- 4. Consultas: total de sensores e media das medicoes por unidade
 -- -----------------------------
+-- DISTINCT: conta cada sensor uma vez, mesmo que ele tenha varias medicoes
+-- AVG: media das medicoes por unidade e por sinal (nao da para misturar bpm, % e C)
+
+-- 4a. Total de sensores por unidade
+SELECT U.nome AS unidade, COUNT(S.idSensor) AS totalSensores
+  FROM Unidade U
+ INNER JOIN Pulseira P ON P.idUnidade = U.idUnidade
+ INNER JOIN Sensor S   ON S.idPulseira = P.idPulseira
+ GROUP BY U.idUnidade, U.nome;
+
+-- 4b. Total de sensores e media das medicoes por unidade e sinal
 SELECT U.nome                      AS unidade,
        T.nome                      AS sinal,
        COUNT(DISTINCT S.idSensor)  AS totalSensores,
