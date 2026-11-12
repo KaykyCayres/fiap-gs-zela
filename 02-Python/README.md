@@ -81,7 +81,7 @@ Os prints de cada teste estão no documento de entrega (PDF).
 
 ## Origem dos dados
 
-Os dados do CSV são **simulados**. O script `gerar_medicoes_pulseira.py` parte do dataset público *"Nine readings per subject"* (Zenodo): para cada participante, calcula a mediana das 9 leituras reais e usa esse valor como ponto de partida. Depois aplica um de cinco perfis de demonstração (`ESTAVEL`, `FC_ELEVANDO`, `SPO2_CAINDO`, `COMBINADO` e `RECUPERACAO`) com ruído reprodutível. A coluna `origem_dado` marca todas as linhas como `SIMULADO`. Os valores não representam pacientes reais nem desfechos clínicos.
+Os dados do CSV são **simulados**. O script `gerar_medicoes_pulseira.py` parte do dataset público *"Five vital signs of normal people"* (Zenodo): para cada participante, calcula a mediana das 9 leituras reais e usa esse valor como ponto de partida. Depois aplica um de cinco perfis de demonstração (`ESTAVEL`, `FC_ELEVANDO`, `SPO2_CAINDO`, `COMBINADO` e `RECUPERACAO`) com ruído reprodutível. A coluna `origem_dado` marca todas as linhas como `SIMULADO`. Os valores não representam pacientes reais nem desfechos clínicos.
 
 ## ODS
 

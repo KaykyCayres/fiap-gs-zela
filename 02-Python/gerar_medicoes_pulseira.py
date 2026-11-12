@@ -1,6 +1,12 @@
 """Gera séries TEMPORAIS SINTÉTICAS a partir de registros do Zenodo.
 Uso exclusivamente acadêmico; não define triagem ou limiares clínicos.
-python gerar_medicoes_pulseira.py --entrada "five vital signs of normal people.csv" --saida medicoes_pulseira_simuladas.csv
+python gerar_medicoes_pulseira.py --entrada "five_vital_signs_of_normal_people.csv" --saida medicoes_pulseira_simuladas.csv
+
+| Integrante | RM |
+|---|---|
+| Kayky Cayres Vicente da Silva | 575091 |
+| Naiara Sousa Soares | 574792 |
+| Rafael Medici | 576249 |
 """
 import argparse
 import numpy as np
@@ -63,7 +69,7 @@ def gerar(entrada, saida, por_paciente=36, seed=2026):
                 'pressao_diastolica': int(round(pad)),
                 'cenario_simulado': perfil, 'origem_dado': 'SIMULADO',
                 # Os valores são SIMULADOS; o Zenodo serve só como referência de faixa por paciente.
-                'fonte_referencia': 'Simulado - faixas inspiradas no dataset Zenodo (Nine readings per subject)',
+                'fonte_referencia': 'Simulado - faixas inspiradas no dataset Zenodo (Five vital signs of normal people)',
             })
     df = pd.DataFrame(registros)
     df.to_csv(saida, index=False, encoding='utf-8-sig')

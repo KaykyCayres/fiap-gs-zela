@@ -8,6 +8,12 @@ uma orientação ao paciente.
 
 ATENCAO: regras experimentais, criadas só para fins acadêmicos.
 O programa NÃO faz diagnóstico e NÃO substitui a equipe de saude.
+
+| Integrante | RM |
+|---|---|
+| Kayky Cayres Vicente da Silva | 575091 |
+| Naiara Sousa Soares | 574792 |
+| Rafael Medici | 576249 |
 """
 
 import csv
