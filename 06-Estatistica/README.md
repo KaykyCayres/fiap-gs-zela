@@ -1,9 +1,47 @@
-# Estatística Aplicada
+# Estatística Aplicada (R)
 
-O que o enunciado pede:
+**Zela** · Global Solution 2026 · CitizenTech
 
-- [ ] Base real em CSV ou XLSX
-- [ ] Frequências de uma variável discreta e de uma contínua
-- [ ] 2 gráficos
-- [ ] Estatística descritiva
-- [ ] Relatório em PDF e código .py ou .R
+| Integrante | RM |
+|---|---|
+| Kayky Cayres Vicente da Silva | 575091 |
+| Naiara Sousa Soares | 574792 |
+| Rafael Medici | 576249 |
+
+## O que é
+
+A Zela é uma pulseira que acompanha a frequência cardíaca (FC), a oxigenação (SpO2) e a temperatura de quem espera atendimento no pronto-socorro. Nesta parte, usamos estatística para entender como esses sinais se comportam em pessoas saudáveis e ver se os limites de alerta da pulseira fazem sentido.
+
+## Arquivos
+
+| Arquivo | O que é |
+|---|---|
+| `five_vital_signs_of_normal_people.csv` | Dados **reais** do Zenodo: 102 pessoas saudáveis, 9 leituras de cada sinal |
+| `medicoes_pulseira_simuladas.csv` | Dados **simulados** pelo grupo a partir dos reais (usados só para comparação) |
+| `analise_estatistica.R` | Código da análise |
+
+## O que o código faz
+
+- Tabela de frequências da **FC** (quantitativa discreta) e da **temperatura** (quantitativa contínua)
+- Gráfico de barras da FC e histograma da temperatura
+- Média, mediana, moda, mínimo, máximo, amplitude, variância, desvio padrão, coeficiente de variação e quartis
+- Comparação entre dados reais e simulados
+- Teste das regras da pulseira em pessoas saudáveis (alarmes falsos)
+
+## Como rodar
+
+1. Deixe os dois CSV na mesma pasta do `analise_estatistica.R`.
+2. No RStudio, instale o pacote da moda (só na primeira vez):
+   ```r
+   install.packages("DescTools")
+   ```
+3. Vá em **Session > Set Working Directory > To Source File Location** e rode o script.
+
+## Principais resultados
+
+- **FC:** nenhuma leitura de pessoa saudável chegou a 110 BPM, então o limite de FC da pulseira não gera alarme falso.
+- **SpO2 e temperatura:** 5,7% e 7,0% das leituras de pessoas saudáveis disparariam um alerta.
+- **Temperatura:** é o sinal com mais ruído; varia mais dentro da mesma pessoa do que entre pessoas.
+- **Conclusão:** a pulseira deve confirmar a alteração em mais de uma leitura antes de alertar.
+
+O relatório completo, com tabelas, gráficos e interpretações, está no PDF de entrega.
