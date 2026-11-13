@@ -1,0 +1,24 @@
+Começa quando o paciente chega ao PS:
+
+1) Chegada e triagem. O paciente passa pela triagem normal do hospital. Se precisar esperar em observação, a enfermagem coloca 
+a pulseira no pulso dele e vincula a pulseira a um código pseudônimo (ex.: P01 → PAC-007). 
+Nada muda na classificação de risco feita pela equipe.
+
+2) Monitoramento na espera. A cada poucos segundos, a pulseira lê BPM, SpO₂ e temperatura. 
+Ela descarta leituras impossíveis e classifica o paciente como NORMAL, ATENÇÃO ou CRÍTICO por regras simples.
+
+3) Aviso no local. O LED mostra o estado na hora: verde, amarelo ou vermelho. Em ATENÇÃO ou CRÍTICO, o buzzer também toca.
+
+4) Aviso na sala da enfermagem. Quando o estado piora para ATENÇÃO ou CRÍTICO, a pulseira envia pelo Wi‑Fi uma mensagem com a pulseira, 
+o paciente, o estado e os sinais. O painel da enfermagem mostra o cartão do paciente em amarelo ou vermelho, com som. 
+Se o paciente continuar em CRÍTICO e ninguém responder, a pulseira repete o aviso a cada minuto.
+
+5) Reação da enfermeira. A enfermeira clica em “Ciente” no painel e vai reavaliar o paciente. 
+O buzzer da pulseira silencia, mas o LED continua mostrando o estado. 
+O sistema só pede a reavaliação: quem decide a conduta é a enfermeira.
+
+6) Histórico em paralelo. Todas as leituras vão para um CSV, que é enviado ao S3. A Lambda grava esses dados no MySQL (RDS), junto com o registro de alertas.
+Análise posterior. Com o histórico, os notebooks treinam a Árvore de Decisão e a rede neural (MLP) para testar se dá para antecipar uma piora. 
+Os resultados dos dois modelos são comparados. Isso é estudo acadêmico e não roda na pulseira.
+
+7) O painel da enfermagem cuida do agora (passos 4 e 5). A AWS e os modelos guardam e analisam o depois (passos 6 e 7).
