@@ -26,7 +26,6 @@
 #define PINO_TEMP     4
 #define PINO_POT_FC   34
 #define PINO_POT_SPO2 35
-#define PINO_BOTAO    33
 #define LED_VERDE     25
 #define LED_AMARELO   26
 #define LED_VERMELHO  27
@@ -55,7 +54,6 @@ DallasTemperature sensorTemp(&oneWire);
 Adafruit_MPU6050 mpu;
 
 unsigned long ultimaLeitura = 0;
-bool pedidoAjuda = false;   // fica true quando o botao e apertado
 bool mpuOk = false;
 
 // ---------------- Funcoes ----------------
@@ -98,7 +96,6 @@ String classificar(int fc, int spo2, float temp, String &motivo) {
   if (fc < FC_BAIXA)        motivo += "FC baixa; ";
   if (spo2 < SPO2_ATENCAO)  motivo += "SpO2 baixa; ";
   if (temp >= TEMP_ATENCAO) motivo += "temperatura alta; ";
-  if (pedidoAjuda)          motivo += "paciente pediu ajuda; ";
   if (motivo != "") return "ATENCAO";
 
   motivo = "sinais dentro do esperado";
@@ -134,7 +131,6 @@ void setup() {
   pinMode(LED_AMARELO, OUTPUT);
   pinMode(LED_VERMELHO, OUTPUT);
   pinMode(PINO_BUZZER, OUTPUT);
-  pinMode(PINO_BOTAO, INPUT_PULLUP);   // apertado = LOW
 
   sensorTemp.begin();
   Wire.begin(21, 22);
@@ -143,15 +139,10 @@ void setup() {
   Serial.println("=== ZELA - pulseira de monitoramento ===");
   Serial.println("Prototipo academico: nao faz diagnostico.");
   if (!mpuOk) Serial.println("Aviso: MPU6050 nao encontrado, movimento = 0.");
-  Serial.println("Formato: t | FC SpO2 TEMP MOV QUAL PEDIDO | ESTADO | motivo | orientacao");
+  Serial.println("Formato: t | FC SpO2 TEMP MOV QUAL | ESTADO | motivo | orientacao");
 }
 
 void loop() {
-  // O botao e conferido o tempo todo, para nao perder o aperto
-  if (digitalRead(PINO_BOTAO) == LOW) {
-    pedidoAjuda = true;
-  }
-
   // Leitura periodica sem travar o programa (millis em vez de delay)
   if (millis() - ultimaLeitura >= INTERVALO_MS) {
     ultimaLeitura = millis();
@@ -173,7 +164,6 @@ void loop() {
     Serial.print(" TEMP="); Serial.print(temp, 1);
     Serial.print(" MOV="); Serial.print(mov, 1);
     Serial.print(" QUAL="); Serial.print(qualidade);
-    Serial.print(" PEDIDO="); Serial.print(pedidoAjuda ? "SIM" : "NAO");
     Serial.print(" | ESTADO="); Serial.print(estado);
     Serial.print(" | motivo: "); Serial.print(motivo);
     Serial.print(" | "); Serial.println(orientacao(estado));
@@ -181,7 +171,5 @@ void loop() {
     if (qualidade == "INSTAVEL") {
       Serial.println("   -> Movimento detectado: fique parado para uma leitura confiavel.");
     }
-
-    pedidoAjuda = false;   // o pedido vale para uma leitura
   }
 }

@@ -6,18 +6,18 @@ Protótipo acadêmico: não faz diagnóstico.
 3 - Demonstrar os 3 cenários de teste
 Escolha uma opção: 
 Cenário 1 - paciente estável
-Entrada: FC = 78 BPM, SpO2 = 98%
-FC: 78 BPM | SpO2: 98% | Estado: NORMAL
+Entrada: FC = 78 BPM, SpO2 = 98%, Temperatura = 36.6 °C
+FC: 78 BPM | SpO2: 98% | Temperatura: 36.6 °C | Estado: NORMAL
   -> Sinais dentro do esperado. Continue aguardando e avise a equipe se sentir algo diferente.
 
-Cenário 2 - FC elevada e SpO2 um pouco baixa
-Entrada: FC = 115 BPM, SpO2 = 93%
-FC: 115 BPM | SpO2: 93% | Estado: ATENCAO
+Cenário 2 - FC elevada, SpO2 um pouco baixa e temperatura alta
+Entrada: FC = 115 BPM, SpO2 = 93%, Temperatura = 37.9 °C
+FC: 115 BPM | SpO2: 93% | Temperatura: 37.9 °C | Estado: ATENCAO
   -> Sinais fora do esperado. Avise a equipe de enfermagem para uma reavaliação.
 
-Cenário 3 - FC muito alta e SpO2 baixa
-Entrada: FC = 138 BPM, SpO2 = 88%
-FC: 138 BPM | SpO2: 88% | Estado: CRITICO
+Cenário 3 - FC muito alta, SpO2 baixa e febre
+Entrada: FC = 138 BPM, SpO2 = 88%, Temperatura = 39.2 °C
+FC: 138 BPM | SpO2: 88% | Temperatura: 39.2 °C | Estado: CRITICO
   -> Sinais preocupantes. Chame a enfermagem imediatamente ou peça ajuda a quem estiver perto.
 
 --- Resumo do paciente DEMO ---

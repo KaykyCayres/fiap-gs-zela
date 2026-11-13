@@ -2,9 +2,9 @@
 Monitor de Pulseira Inteligente - Global Solution 2026 - Citizen Tech
 Computational Thinking with Python
 
-Classifica leituras de frequência cardíaca (FC) e oxigenação (SpO2)
-de pacientes que aguardam atendimento no pronto-socorro e mostra
-uma orientação ao paciente.
+Classifica leituras de frequência cardíaca (FC), oxigenação (SpO2) e
+temperatura de pacientes que aguardam atendimento no pronto-socorro e
+mostra uma orientação ao paciente.
 
 ATENCAO: regras experimentais, criadas só para fins acadêmicos.
 O programa NÃO faz diagnóstico e NÃO substitui a equipe de saude.
@@ -27,6 +27,7 @@ ARQUIVO_CSV = os.path.join(PASTA_DO_PROGRAMA, 'medicoes_pulseira_simuladas.csv')
 
 # ---------------------------------------------------------------
 # Limites usados nas regras (valores de referência simplificados)
+# São os mesmos da pulseira (firmware) e do banco de dados.
 # ---------------------------------------------------------------
 # FC em repouso de um adulto costuma ficar entre 60 e 100 BPM.
 # Acima de 110 consideramos ATENCAO e a partir de 130, CRITICO.
@@ -40,9 +41,15 @@ FC_BAIXA = 50
 SPO2_ATENCAO = 95
 SPO2_CRITICO = 90
 
+# Temperatura: a partir de 37,8 °C consideramos ATENCAO e de 39,0 °C, CRITICO.
+# É a temperatura lida pela pulseira, não uma medida clínica.
+TEMP_ATENCAO = 37.8
+TEMP_CRITICO = 39.0
+
 # Faixas aceitas na digitação (evita valores impossíveis)
 FC_MIN, FC_MAX = 20, 250
 SPO2_MIN, SPO2_MAX = 50, 100
+TEMP_MIN, TEMP_MAX = 30, 45
 
 # Orientação ao paciente para cada estado.
 # Sempre encaminha para a equipe; nunca indica remedio / conduta.
@@ -60,11 +67,11 @@ class MonitorPaciente:
         self.paciente_id = paciente_id
         self.historico = []  # lista de dicionarios, uma leitura por item
 
-    def classificar(self, fc, spo2):
+    def classificar(self, fc, spo2, temp):
         # A regra mais grave é testada primeiro.
-        if fc >= FC_CRITICO or spo2 < SPO2_CRITICO:
+        if fc >= FC_CRITICO or spo2 < SPO2_CRITICO or temp >= TEMP_CRITICO:
             return 'CRITICO'
-        elif fc >= FC_ATENCAO or fc < FC_BAIXA or spo2 < SPO2_ATENCAO:
+        elif fc >= FC_ATENCAO or fc < FC_BAIXA or spo2 < SPO2_ATENCAO or temp >= TEMP_ATENCAO:
             return 'ATENCAO'
         else:
             return 'NORMAL'
@@ -72,13 +79,13 @@ class MonitorPaciente:
     def recomendar(self, estado):
         return RECOMENDACOES[estado]
 
-    def registrar(self, fc, spo2):
-        estado = self.classificar(fc, spo2)
-        leitura = {'fc': fc, 'spo2': spo2, 'estado': estado}
+    def registrar(self, fc, spo2, temp):
+        estado = self.classificar(fc, spo2, temp)
+        leitura = {'fc': fc, 'spo2': spo2, 'temp': temp, 'estado': estado}
         self.historico.append(leitura)
 
-        print(f'FC: {fc} BPM | SpO2: {spo2}% | Estado: {estado}  -> {self.recomendar(estado)}')
-        #print(f'  -> {self.recomendar(estado)}')
+        print(f'FC: {fc} BPM | SpO2: {spo2}% | Temperatura: {temp:.1f} °C | Estado: {estado}')
+        print(f'  -> {self.recomendar(estado)}')
         return estado
 
     def resumo(self):
@@ -117,7 +124,9 @@ def ler_csv(nome_arquivo, paciente_id):
             if linha['paciente_id'] == paciente_id:
                 print(f"Leitura {linha['leitura_numero']} "
                       f"({linha['tempo_espera_min']} min de espera):")
-                monitor.registrar(int(linha['frequencia_cardiaca']), float(linha['spo2']))
+                monitor.registrar(int(linha['frequencia_cardiaca']),
+                                  float(linha['spo2']),
+                                  float(linha['temperatura']))
 
     if len(monitor.historico) == 0:
         print('Nenhuma medição encontrada para esse paciente.')
@@ -131,7 +140,8 @@ def digitar_medicoes():
     while True:
         fc = int(ler_numero('Frequência cardíaca (BPM): ', FC_MIN, FC_MAX))
         spo2 = ler_numero('Oxigenação (SpO2 %): ', SPO2_MIN, SPO2_MAX)
-        monitor.registrar(fc, spo2)
+        temp = ler_numero('Temperatura (°C): ', TEMP_MIN, TEMP_MAX)
+        monitor.registrar(fc, spo2, temp)
 
         continuar = input('Deseja fazer outra medição? (s/n): ').lower()
         if continuar != 's':
@@ -143,16 +153,16 @@ def digitar_medicoes():
 def demonstrar_cenarios():
     """3 cenarios de teste pedidos no enunciado."""
     cenarios = [
-        ('Cenário 1 - paciente estável', 78, 98),
-        ('Cenário 2 - FC elevada e SpO2 um pouco baixa', 115, 93),
-        ('Cenário 3 - FC muito alta e SpO2 baixa', 138, 88),
+        ('Cenário 1 - paciente estável', 78, 98, 36.6),
+        ('Cenário 2 - FC elevada, SpO2 um pouco baixa e temperatura alta', 115, 93, 37.9),
+        ('Cenário 3 - FC muito alta, SpO2 baixa e febre', 138, 88, 39.2),
     ]
 
     monitor = MonitorPaciente('DEMO')
-    for nome, fc, spo2 in cenarios:
+    for nome, fc, spo2, temp in cenarios:
         print(f'\n{nome}')
-        print(f'Entrada: FC = {fc} BPM, SpO2 = {spo2}%')
-        monitor.registrar(fc, spo2)
+        print(f'Entrada: FC = {fc} BPM, SpO2 = {spo2}%, Temperatura = {temp} °C')
+        monitor.registrar(fc, spo2, temp)
 
     monitor.resumo()
 

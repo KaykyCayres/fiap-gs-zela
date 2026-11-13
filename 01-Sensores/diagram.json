@@ -19,13 +19,6 @@
       "attrs": { "label": "FC (simulada)", "value": "281" }
     },
     {
-      "type": "wokwi-pushbutton",
-      "id": "botao",
-      "top": -33,
-      "left": -505,
-      "attrs": { "color": "blue", "xray": "1", "bounce": "0", "label": "Chamar enfermagem" }
-    },
-    {
       "type": "wokwi-led",
       "id": "ledNormal",
       "top": -51.6,
@@ -95,9 +88,7 @@
     [ "esp:3V3", "potFC:VCC", "red", [ "h-14", "v-28.7" ] ],
     [ "potSpO2:VCC", "potFC:VCC", "red", [ "v26" ] ],
     [ "potFC:GND", "potSpO2:GND", "black", [ "v36" ] ],
-    [ "potSpO2:GND", "botao:2.l", "black", [ "v36", "h-140", "v279" ] ],
     [ "potSpO2:GND", "esp:GND.1", "black", [] ],
-    [ "esp:33", "botao:1.r", "blue", [ "h-262.9", "v174.1" ] ],
     [ "esp:25", "ledNormal:A", "green", [ "h-216.1", "v174.5" ] ],
     [ "ledNormal:C", "rGreen:1", "black", [] ],
     [ "esp:26", "ledAtencao:A", "gold", [ "h-170.2", "v164.9" ] ],

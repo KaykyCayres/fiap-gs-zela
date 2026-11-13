@@ -22,7 +22,6 @@ Depois da triagem, o paciente do pronto-socorro fica na sala de espera sem ningu
 | MPU6050 | Movimento (se o paciente está se mexendo) | SDA 21 · SCL 22 |
 | Potenciômetro | Simula a frequência cardíaca (FC) | GPIO 34 |
 | Potenciômetro | Simula a oxigenação (SpO2) | GPIO 35 |
-| Botão | Paciente pede ajuda | GPIO 33 |
 | LED verde, amarelo e vermelho | Mostram o estado | GPIO 25 · 26 · 27 |
 | Buzzer | Alerta sonoro | GPIO 14 |
 
@@ -35,7 +34,7 @@ A cada 2 segundos, o ESP32 lê os sensores e classifica:
 | Estado | Quando | Alerta |
 |---|---|---|
 | 🔴 CRÍTICO | FC ≥ 130, SpO2 < 90 ou temperatura ≥ 39,0 °C | LED vermelho e bipe longo |
-| 🟡 ATENÇÃO | FC ≥ 110, FC < 50, SpO2 < 95, temperatura ≥ 37,8 °C ou botão apertado | LED amarelo e bipe curto |
+| 🟡 ATENÇÃO | FC ≥ 110, FC < 50, SpO2 < 95, temperatura ≥ 37,8 °C | LED amarelo e bipe curto |
 | 🟢 NORMAL | Nenhuma das condições acima | LED verde |
 
 Se o paciente estiver se mexendo muito, a leitura aparece como `QUAL=INSTAVEL`, porque o movimento atrapalha a medição.
@@ -43,7 +42,7 @@ Se o paciente estiver se mexendo muito, a leitura aparece como `QUAL=INSTAVEL`, 
 Cada leitura vira uma linha no Monitor Serial:
 
 ```
-t=12s | FC=78 SpO2=98 TEMP=36.5 MOV=0.0 QUAL=OK PEDIDO=NAO | ESTADO=NORMAL | motivo: sinais dentro do esperado | Continue aguardando
+t=12s | FC=78 SpO2=98 TEMP=36.5 MOV=0.0 QUAL=OK | ESTADO=NORMAL | motivo: sinais dentro do esperado | Continue aguardando
 ```
 
 ## Como rodar
@@ -53,7 +52,6 @@ t=12s | FC=78 SpO2=98 TEMP=36.5 MOV=0.0 QUAL=OK PEDIDO=NAO | ESTADO=NORMAL | mot
 3. Inicie a simulação e teste:
    - gire os potenciômetros para mudar FC e SpO2;
    - clique no DS18B20 para mudar a temperatura;
-   - clique no MPU6050 para simular movimento;
-   - aperte o botão para pedir ajuda.
+   - clique no MPU6050 para simular movimento.
 
 Os prints dos testes estão no documento de entrega (PDF).

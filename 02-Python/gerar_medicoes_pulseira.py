@@ -9,8 +9,16 @@ python gerar_medicoes_pulseira.py --entrada "five_vital_signs_of_normal_people.c
 | Rafael Medici | 576249 |
 """
 import argparse
+from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
+
+# Horário simulado: o 1º paciente começa às 14:00 de 10/11/2026 e cada um dos
+# seguintes entra 5 minutos depois. Dentro de cada paciente, uma leitura a cada 2 minutos.
+# Combina com os monitoramentos de exemplo do banco de dados.
+INICIO = datetime(2026, 11, 10, 14, 0, 0)
+ENTRADA_ENTRE_PACIENTES_MIN = 5
+INTERVALO_LEITURAS_MIN = 2
 
 CAMPOS = {
     'pressao_diastolica': 'Diastolic blood pressure reading',
@@ -22,9 +30,10 @@ CAMPOS = {
 # Perfis de DEMONSTRAÇÃO, não classificação médica.
 PERFIS = {
     'ESTAVEL': {'fc': 0, 'spo2': 0, 'temp': 0, 'pas': 0, 'pad': 0},
-    'FC_ELEVANDO': {'fc': 38, 'spo2': -1, 'temp': 0.2, 'pas': 12, 'pad': 5},
+    # A temperatura sobe o bastante para cruzar os limites (37,8 e 39,0 °C) em parte dos pacientes.
+    'FC_ELEVANDO': {'fc': 38, 'spo2': -1, 'temp': 1.8, 'pas': 12, 'pad': 5},
     'SPO2_CAINDO': {'fc': 16, 'spo2': -9, 'temp': 0.1, 'pas': -5, 'pad': -2},
-    'COMBINADO': {'fc': 48, 'spo2': -12, 'temp': 1.2, 'pas': -15, 'pad': -8},
+    'COMBINADO': {'fc': 48, 'spo2': -12, 'temp': 3.0, 'pas': -15, 'pad': -8},
     'RECUPERACAO': {'fc': 34, 'spo2': -7, 'temp': 0.5, 'pas': -8, 'pad': -4},
 }
 
@@ -63,7 +72,9 @@ def gerar(entrada, saida, por_paciente=36, seed=2026):
             pad = np.clip(base['pressao_diastolica'] + d['pad'] * fator + ruido['pressao_diastolica'], 40, min(130, pas-10))
             registros.append({
                 'paciente_id': int(pessoa['Subject ID']), 'dispositivo_id': f'ESP32-{pos+1:04d}',
-                'leitura_numero': t+1, 'tempo_espera_min': t*2,
+                'leitura_numero': t+1, 'tempo_espera_min': t*INTERVALO_LEITURAS_MIN,
+                'dt_medicao': (INICIO + timedelta(minutes=pos*ENTRADA_ENTRE_PACIENTES_MIN
+                                                  + t*INTERVALO_LEITURAS_MIN)).strftime('%Y-%m-%d %H:%M:%S'),
                 'frequencia_cardiaca': int(round(fc)), 'spo2': round(float(spo2),1),
                 'temperatura': round(float(temp),2), 'pressao_sistolica': int(round(pas)),
                 'pressao_diastolica': int(round(pad)),

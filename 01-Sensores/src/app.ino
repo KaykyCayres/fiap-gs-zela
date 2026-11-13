@@ -26,7 +26,6 @@
 #define PINO_TEMP     4
 #define PINO_POT_FC   34
 #define PINO_POT_SPO2 35
-#define PINO_BOTAO    33
 #define LED_VERDE     25
 #define LED_AMARELO   26
 #define LED_VERMELHO  27
@@ -56,12 +55,6 @@ Adafruit_MPU6050 mpu;
 
 unsigned long ultimaLeitura = 0;
 bool mpuOk = false;
-
-// Pedido de ajuda: fica ativo por 10 segundos depois do aperto do botao
-const unsigned long DURACAO_PEDIDO_MS = 10000;
-unsigned long momentoPedido = 0;
-bool pedidoAjuda = false;
-int estadoBotaoAnterior = HIGH;
 
 // ---------------- Funcoes ----------------
 
@@ -105,8 +98,6 @@ String classificar(int fc, int spo2, float temp, String &motivo) {
   if (temp >= TEMP_ATENCAO) motivo += "temperatura alta; ";
   if (motivo != "") return "ATENCAO";
 
-  if (pedidoAjuda) return "ATENCAO";   // sinais normais, mas o paciente pediu ajuda
-
   motivo = "sinais dentro do esperado";
   return "NORMAL";
 }
@@ -141,7 +132,6 @@ void setup() {
   pinMode(LED_AMARELO, OUTPUT);
   pinMode(LED_VERMELHO, OUTPUT);
   pinMode(PINO_BUZZER, OUTPUT);
-  pinMode(PINO_BOTAO, INPUT_PULLUP);   // apertado = LOW
 
   sensorTemp.begin();
   Wire.begin(21, 22);
@@ -150,21 +140,10 @@ void setup() {
   Serial.println("=== ZELA - pulseira de monitoramento ===");
   Serial.println("Prototipo academico: nao faz diagnostico.");
   if (!mpuOk) Serial.println("Aviso: MPU6050 nao encontrado, movimento = 0.");
-  Serial.println("Formato: t | FC SpO2 TEMP MOV QUAL PEDIDO | ESTADO | motivo | orientacao");
+  Serial.println("Formato: t | FC SpO2 TEMP MOV QUAL | ESTADO | motivo | orientacao");
 }
 
 void loop() {
-  // O botao e conferido o tempo todo, para nao perder o aperto.
-  // So conta quando ele passa de solto (HIGH) para apertado (LOW).
-  int estadoBotao = digitalRead(PINO_BOTAO);
-  if (estadoBotaoAnterior == HIGH && estadoBotao == LOW) {
-    momentoPedido = millis();
-    Serial.println(">> PEDIDO DE AJUDA registrado pelo paciente (ativo por 10 s)");
-    tone(PINO_BUZZER, 1500, 100);   // bipe de confirmacao
-  }
-  estadoBotaoAnterior = estadoBotao;
-  pedidoAjuda = (momentoPedido > 0 && millis() - momentoPedido < DURACAO_PEDIDO_MS);
-
   // Leitura periodica sem travar o programa (millis em vez de delay)
   if (millis() - ultimaLeitura >= INTERVALO_MS) {
     ultimaLeitura = millis();
@@ -177,7 +156,6 @@ void loop() {
 
     String motivo;
     String estado = classificar(fc, spo2, temp, motivo);
-    if (pedidoAjuda) motivo += "paciente pediu ajuda; ";
     if (motivo.endsWith("; ")) motivo.remove(motivo.length() - 2);   // tira o ultimo "; "
     
     // Uma linha por leitura, sempre na mesma ordem
@@ -187,7 +165,6 @@ void loop() {
     Serial.print(" TEMP="); Serial.print(temp, 1);
     Serial.print(" MOV="); Serial.print(mov, 1);
     Serial.print(" QUAL="); Serial.print(qualidade);
-    Serial.print(" PEDIDO="); Serial.print(pedidoAjuda ? "SIM" : "NAO");
     Serial.print(" | ESTADO="); Serial.print(estado);
     Serial.print(" | motivo: "); Serial.print(motivo);
     Serial.print(" | "); Serial.println(orientacao(estado));
