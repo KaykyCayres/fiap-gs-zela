@@ -49,9 +49,24 @@ t=12s | FC=78 SpO2=98 TEMP=36.5 MOV=0.0 QUAL=OK | ESTADO=NORMAL | motivo: sinais
 
 1. Abra o projeto no Wokwi com o `app.ino` e o `diagram.json` desta pasta.
 2. Instale as bibliotecas: OneWire, DallasTemperature, Adafruit MPU6050 e Adafruit Unified Sensor.
-3. Inicie a simulação e teste:
+3. Compile o projeto com o PlatformIO (`pio run`), porque o `wokwi.toml` usa o firmware gerado na compilação.
+4. Inicie a simulação e teste:
    - gire os potenciômetros para mudar FC e SpO2;
    - clique no DS18B20 para mudar a temperatura;
    - clique no MPU6050 para simular movimento.
 
-Os prints dos testes estão no documento de entrega (PDF).
+## Testes realizados
+
+| Teste | Entrada | Resultado |
+|---|---|---|
+| 1 · Paciente estável | FC 78 · SpO2 98% · 36,5 °C · sem movimento | NORMAL, LED verde |
+| 2 · Frequência cardíaca alta | FC 104 → 125 | NORMAL → ATENÇÃO (motivo: FC alta), LED amarelo |
+| 3 · Oxigenação caindo | SpO2 98 → 93 → 85% | NORMAL → ATENÇÃO (SpO2 baixa) → CRÍTICO (SpO2 muito baixa), LED vermelho |
+| 4 · FC no limite e SpO2 muito baixa | FC 125 → 129 e SpO2 100 → 86% | Com FC 129 ainda é ATENÇÃO (o limite crítico é 130); com SpO2 86% vira CRÍTICO |
+| 5 · Temperatura alta | 38,9 → 38,0 °C | ATENÇÃO nas duas leituras (motivo: temperatura alta), LED amarelo |
+| 6 · Temperatura muito alta | 36,5 → 38,3 → 39,1 °C | NORMAL → ATENÇÃO → CRÍTICO (motivo: temperatura muito alta) |
+| 7 · Paciente se mexendo | Aceleração do MPU6050 com MOV = 4,1 m/s² | `QUAL=INSTAVEL` com o aviso "fique parado"; o estado continua NORMAL |
+
+Em cada teste, os prints mostram os três LEDs (aceso ou apagado) e as linhas do Monitor Serial do momento. Eles foram gerados com o simulador do Wokwi e estão no documento de entrega (PDF).
+
+O simulador mostra o aviso "LEDC is not initialized" no primeiro bipe. Ele vem da biblioteca do ESP32 e não afeta o resultado.
