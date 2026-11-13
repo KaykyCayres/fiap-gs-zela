@@ -74,8 +74,10 @@ A regra crítica é testada primeiro, para que o caso mais grave nunca seja clas
 | Teste | Entrada | Resultado |
 |---|---|---|
 | 1 · Opção 3 | FC 78 / SpO2 98% / 36,6 °C · FC 115 / SpO2 93% / 37,9 °C · FC 138 / SpO2 88% / 39,2 °C | NORMAL, ATENÇÃO e CRÍTICO, cada um com a sua orientação |
-| 2 · Opção 1, paciente 4 | 36 leituras do CSV | Normal nas leituras 1 a 7, atenção de 8 a 18 e crítico de 19 a 36; o resumo avisa que houve leitura crítica |
-| 3 · Opção 2 | FC 999 (recusada); FC 100, SpO2 93% e temperatura 55 (recusada) e depois 36,8 °C; FC 80, SpO2 98% e 39,2 °C | 999 é recusado (fora da faixa de 20 a 250) e 55 °C também (faixa de 30 a 45); a leitura de 36,8 °C sai como ATENÇÃO; a última sai como CRÍTICO só pela temperatura |
+| 2 · Opção 1, paciente 4 | 36 leituras do CSV | Normal nas leituras 1 a 7, atenção de 8 a 18 e crítico de 19 a 36, com a temperatura subindo de 36,0 para 39,0 °C; o resumo conta 7 normais, 11 em atenção e 18 críticas e avisa que houve leitura crítica |
+| 3 · Opção 1, paciente 42 | 36 leituras do CSV | Normal nas leituras 1 a 14, atenção de 15 a 35 e crítico só na 36. Na leitura 15 a temperatura chega a 37,8 °C e o estado vira atenção mesmo com FC e SpO2 normais, e na 36 ela chega a 39,1 °C e vira crítico; o resumo conta 14 normais, 21 em atenção e 1 crítica |
+| 4 · Opção 2 | FC 999 (recusada); FC 100, SpO2 93% e temperatura 55 (recusada) e depois 36,8 °C; FC 80, SpO2 98% e 39,2 °C | 999 é recusado (fora da faixa de 20 a 250) e 55 °C também (faixa de 30 a 45); a leitura de 36,8 °C sai como ATENÇÃO; a última sai como CRÍTICO só pela temperatura |
+| 5 · Opção inválida e paciente inexistente | Opção 9 no menu; opção 1 com o paciente 999 | "Opção invalida." para a opção 9 e "Nenhuma medição encontrada para esse paciente." para o paciente 999 |
 
 Os prints de cada teste estão no documento de entrega (PDF).
 

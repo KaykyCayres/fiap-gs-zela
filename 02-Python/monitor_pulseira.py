@@ -25,7 +25,7 @@ ARQUIVO_CSV = os.path.join(PASTA_DO_PROGRAMA, 'medicoes_pulseira_simuladas.csv')
 
 
 
-# ---------------------------------------------------------------
+# ---------------------------------------cls------------------------
 # Limites usados nas regras (valores de referência simplificados)
 # São os mesmos da pulseira (firmware) e do banco de dados.
 # ---------------------------------------------------------------
@@ -84,8 +84,7 @@ class MonitorPaciente:
         leitura = {'fc': fc, 'spo2': spo2, 'temp': temp, 'estado': estado}
         self.historico.append(leitura)
 
-        print(f'FC: {fc} BPM | SpO2: {spo2}% | Temperatura: {temp:.1f} °C | Estado: {estado}')
-        print(f'  -> {self.recomendar(estado)}')
+        print(f'FC: {fc} BPM | SpO2: {spo2}% | Temperatura: {temp:.1f} °C | Estado: {estado} -> {self.recomendar(estado)}')
         return estado
 
     def resumo(self):
