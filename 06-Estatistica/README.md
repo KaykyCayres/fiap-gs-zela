@@ -42,6 +42,7 @@ A Zela é uma pulseira que acompanha a frequência cardíaca (FC), a oxigenaçã
 - **FC:** nenhuma leitura de pessoa saudável chegou a 110 BPM, então o limite de FC da pulseira não gera alarme falso.
 - **SpO2 e temperatura:** 5,7% e 7,0% das leituras de pessoas saudáveis disparariam um alerta.
 - **Temperatura:** é o sinal com mais ruído; varia mais dentro da mesma pessoa do que entre pessoas.
-- **Conclusão:** a pulseira deve confirmar a alteração em mais de uma leitura antes de alertar.
+- **Real × simulado:** a FC simulada é mais alta e mais espalhada que a real, porque inclui perfis de piora. A temperatura simulada tem dispersão parecida com a real (desvio padrão 1,07 e 1,09 °C), mas por outro motivo: na simulada ela vem dos perfis com febre, e na real vem do ruído de medição.
+- **Conclusão:** a pulseira deve confirmar a alteração em mais de uma leitura antes de alertar. O protótipo atual da Zela ainda alerta na primeira leitura fora da faixa, então essa confirmação é uma melhoria recomendada que ainda não foi implementada.
 
 O relatório completo, com tabelas, gráficos e interpretações, está no PDF de entrega.
