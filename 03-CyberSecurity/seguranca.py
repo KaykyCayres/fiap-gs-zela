@@ -8,6 +8,8 @@ Protecoes basicas aplicadas ao fluxo da pulseira:
   2. Integridade do arquivo -> detecta se o CSV foi alterado depois de gerado
   3. Privacidade (LGPD)     -> mostra so um codigo do paciente, nunca nome ou CPF
 
+Sinais usados: frequencia cardiaca (FC), saturacao de oxigenio (SpO2) e temperatura,
+com os mesmos limites do monitor_pulseira.py, do ESP32 e do banco de dados.
 Limites de classificacao: DEMONSTRACAO academica, sem valor clinico.
 """
 import csv
@@ -17,30 +19,34 @@ import os
 # Faixas possiveis para o sensor (fora disso a leitura e considerada erro)
 FAIXA_FC = (20, 250)      # batimentos por minuto (mesma faixa do monitor_pulseira.py)
 FAIXA_SPO2 = (50, 100)    # saturacao de oxigenio em %
+FAIXA_TEMP = (30, 45)     # temperatura em graus C (mesma faixa do monitor_pulseira.py)
 
 # Campos que nunca podem aparecer na saida
 CAMPOS_PESSOAIS = ["nome", "cpf", "telefone", "endereco", "email"]
 
 
-def validar_medicao(fc_texto, spo2_texto):
-    """Protecao 1: confere se as duas medicoes sao numeros dentro da faixa."""
+def validar_medicao(fc_texto, spo2_texto, temp_texto):
+    """Protecao 1: confere se as tres medicoes sao numeros dentro da faixa."""
     try:
         fc = float(fc_texto)
         spo2 = float(spo2_texto)
+        temp = float(str(temp_texto).replace(",", "."))
     except ValueError:
-        return False, None, None, "valor nao numerico"
+        return False, None, None, None, "valor nao numerico"
     if not (FAIXA_FC[0] <= fc <= FAIXA_FC[1]):
-        return False, None, None, f"FC {fc:g} fora da faixa {FAIXA_FC}"
+        return False, None, None, None, f"FC {fc:g} fora da faixa {FAIXA_FC}"
     if not (FAIXA_SPO2[0] <= spo2 <= FAIXA_SPO2[1]):
-        return False, None, None, f"SpO2 {spo2:g} fora da faixa {FAIXA_SPO2}"
-    return True, fc, spo2, "ok"
+        return False, None, None, None, f"SpO2 {spo2:g} fora da faixa {FAIXA_SPO2}"
+    if not (FAIXA_TEMP[0] <= temp <= FAIXA_TEMP[1]):
+        return False, None, None, None, f"Temperatura {temp:g} fora da faixa {FAIXA_TEMP}"
+    return True, fc, spo2, temp, "ok"
 
 
-def classificar(fc, spo2):
-    """Mesmas regras do monitor_pulseira.py (Python) e do ESP32 (AICSS)."""
-    if fc >= 130 or spo2 < 90:
+def classificar(fc, spo2, temp):
+    """Mesmas regras do monitor_pulseira.py (Python), do ESP32 (AICSS) e do banco."""
+    if fc >= 130 or spo2 < 90 or temp >= 39.0:
         return "CRITICO"
-    if fc >= 110 or fc < 50 or spo2 < 95:
+    if fc >= 110 or fc < 50 or spo2 < 95 or temp >= 37.8:
         return "ATENCAO"
     return "NORMAL"
 
@@ -75,7 +81,8 @@ def linha_segura(registro, nivel):
     """Monta a saida so com o codigo do paciente e as medicoes."""
     return (f"{codigo_paciente(registro['paciente_id'])} | "
             f"FC: {registro['frequencia_cardiaca']} bpm | "
-            f"SpO2: {registro['spo2']} % | {nivel}")
+            f"SpO2: {registro['spo2']} % | "
+            f"Temp: {registro['temperatura']} C | {nivel}")
 
 
 def processar_csv(caminho, paciente_id=None, limite=None):
@@ -91,13 +98,14 @@ def processar_csv(caminho, paciente_id=None, limite=None):
         for registro in csv.DictReader(f):
             if paciente_id and registro["paciente_id"] != str(paciente_id):
                 continue
-            ok, fc, spo2, motivo = validar_medicao(registro["frequencia_cardiaca"],
-                                                   registro["spo2"])
+            ok, fc, spo2, temp, motivo = validar_medicao(registro["frequencia_cardiaca"],
+                                                         registro["spo2"],
+                                                         registro["temperatura"])
             if not ok:
                 resumo["RECUSADA"] += 1
                 print(f"{codigo_paciente(registro['paciente_id'])} | RECUSADA: {motivo}")
                 continue
-            nivel = classificar(fc, spo2)
+            nivel = classificar(fc, spo2, temp)
             resumo[nivel] += 1
             exibidas = sum(resumo.values())
             if limite is None or exibidas <= limite:
@@ -121,8 +129,9 @@ def menu():
     elif opcao == "2":
         processar_csv(caminho, input("ID do paciente: ").strip())
     elif opcao == "3":
-        ok, fc, spo2, motivo = validar_medicao(input("FC (bpm): "), input("SpO2 (%): "))
-        print(classificar(fc, spo2) if ok else f"RECUSADA: {motivo}")
+        ok, fc, spo2, temp, motivo = validar_medicao(input("FC (bpm): "), input("SpO2 (%): "),
+                                                     input("Temperatura (C): "))
+        print(classificar(fc, spo2, temp) if ok else f"RECUSADA: {motivo}")
     else:
         print("Opcao invalida.")
 

@@ -1,41 +1,44 @@
-==============================================================
+==================================================================
 TESTE 1 - Entrada invalida (protecao: validacao de entrada)
-==============================================================
-Entrada FC=  75 SpO2=  98 -> NORMAL
-Entrada FC= abc SpO2=  97 -> RECUSADA - valor nao numerico
-Entrada FC= 900 SpO2=  96 -> RECUSADA - FC 900 fora da faixa (20, 250)
-Entrada FC=  80 SpO2= 150 -> RECUSADA - SpO2 150 fora da faixa (50, 100)
-Entrada FC=  -5 SpO2=  95 -> RECUSADA - FC -5 fora da faixa (20, 250)
-Entrada FC= 135 SpO2=  88 -> CRITICO
+==================================================================
+Entrada FC=  75 SpO2=  98 Temp=36.5 -> NORMAL
+Entrada FC= abc SpO2=  97 Temp=36.6 -> RECUSADA - valor nao numerico
+Entrada FC= 900 SpO2=  96 Temp=36.6 -> RECUSADA - FC 900 fora da faixa (20, 250)
+Entrada FC=  80 SpO2= 150 Temp=36.6 -> RECUSADA - SpO2 150 fora da faixa (50, 100)
+Entrada FC=  -5 SpO2=  95 Temp=36.6 -> RECUSADA - FC -5 fora da faixa (20, 250)
+Entrada FC=  80 SpO2=  97 Temp=  55 -> RECUSADA - Temperatura 55 fora da faixa (30, 45)
+Entrada FC=  80 SpO2=  98 Temp=38.0 -> ATENCAO
+Entrada FC= 135 SpO2=  88 Temp=39.2 -> CRITICO
 
-==============================================================
+==================================================================
 TESTE 2 - Arquivo alterado (protecao: hash SHA-256)
-==============================================================
+==================================================================
 a) Arquivo original:
 
 Arquivo: medicoes_pulseira_simuladas.csv
 Integridade conferida: arquivo igual ao original.
-PAC-0004 | FC: 86 bpm | SpO2: 95.4 % | NORMAL
-PAC-0004 | FC: 87 bpm | SpO2: 95.9 % | NORMAL
-PAC-0004 | FC: 87 bpm | SpO2: 95.0 % | NORMAL
-PAC-0004 | FC: 86 bpm | SpO2: 95.3 % | NORMAL
+PAC-0004 | FC: 86 bpm | SpO2: 95.4 % | Temp: 36.03 C | NORMAL
+PAC-0004 | FC: 87 bpm | SpO2: 95.9 % | Temp: 36.12 C | NORMAL
+PAC-0004 | FC: 87 bpm | SpO2: 95.0 % | Temp: 36.12 C | NORMAL
+PAC-0004 | FC: 86 bpm | SpO2: 95.3 % | Temp: 36.11 C | NORMAL
 ...
 Resumo: {'NORMAL': 7, 'ATENCAO': 11, 'CRITICO': 18, 'RECUSADA': 0}
 
-b) Alguem troca a SpO2 critica do paciente 4: 84.8 -> 99.0
+b) Alguem troca a SpO2 da ultima leitura do paciente 4: 84.8 -> 99.0
 
 Arquivo: medicoes_alterado.csv
 BLOQUEADO: o arquivo foi alterado ou nao tem registro de origem.
 Nenhuma orientacao foi gerada.
 
-==============================================================
+==================================================================
 TESTE 3 - Dados pessoais (protecao: pseudonimo / LGPD)
-==============================================================
+==================================================================
 Entrada recebida (dados ficticios):
    paciente_id: 7
    nome: Maria da Silva
    cpf: 123.456.789-00
    frequencia_cardiaca: 118
    spo2: 93.5
-Saida exibida   : PAC-0007 | FC: 118 bpm | SpO2: 93.5 % | ATENCAO
+   temperatura: 37.9
+Saida exibida   : PAC-0007 | FC: 118 bpm | SpO2: 93.5 % | Temp: 37.9 C | ATENCAO
 Dados pessoais na saida: nenhum
