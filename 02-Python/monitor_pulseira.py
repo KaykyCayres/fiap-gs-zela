@@ -25,7 +25,7 @@ ARQUIVO_CSV = os.path.join(PASTA_DO_PROGRAMA, 'medicoes_pulseira_simuladas.csv')
 
 
 
-# ---------------------------------------cls------------------------
+# ---------------------------------------------------------------
 # Limites usados nas regras (valores de referência simplificados)
 # São os mesmos da pulseira (firmware) e do banco de dados.
 # ---------------------------------------------------------------
@@ -76,15 +76,47 @@ class MonitorPaciente:
         else:
             return 'NORMAL'
 
+    def motivos(self, fc, spo2, temp):
+        """Diz qual sinal saiu do esperado (mesmos motivos da pulseira)."""
+        lista = []
+        if fc >= FC_CRITICO:
+            lista.append('FC muito alta')
+        elif fc >= FC_ATENCAO:
+            lista.append('FC alta')
+        elif fc < FC_BAIXA:
+            lista.append('FC baixa')
+
+        if spo2 < SPO2_CRITICO:
+            lista.append('SpO2 muito baixa')
+        elif spo2 < SPO2_ATENCAO:
+            lista.append('SpO2 baixa')
+
+        if temp >= TEMP_CRITICO:
+            lista.append('temperatura muito alta')
+        elif temp >= TEMP_ATENCAO:
+            lista.append('temperatura alta')
+        return lista
+
     def recomendar(self, estado):
         return RECOMENDACOES[estado]
 
-    def registrar(self, fc, spo2, temp):
+    def registrar(self, fc, spo2, temp, prefixo=''):
+        """Classifica e guarda a leitura.
+        Sem prefixo (digitação e cenários): mostra motivo e orientação em linhas separadas.
+        Com prefixo (leitura do CSV): mostra tudo em uma linha só, para caber na tela."""
         estado = self.classificar(fc, spo2, temp)
+        motivos = self.motivos(fc, spo2, temp)
         leitura = {'fc': fc, 'spo2': spo2, 'temp': temp, 'estado': estado}
         self.historico.append(leitura)
 
-        print(f'FC: {fc} BPM | SpO2: {spo2}% | Temperatura: {temp:.1f} °C | Estado: {estado} -> {self.recomendar(estado)}')
+        valores = f'FC: {fc} BPM | SpO2: {spo2:g}% | Temp: {temp:.1f} °C | {estado}'
+        if prefixo:
+            print(f'{prefixo} | {valores}' + (f' ({", ".join(motivos)})' if motivos else ''))
+        else:
+            print(valores.replace('Temp:', 'Temperatura:').replace(f' | {estado}', f' | Estado: {estado}'))
+            if motivos:
+                print('Motivo:', ', '.join(motivos))
+            print('Orientação:', self.recomendar(estado))
         return estado
 
     def resumo(self):
@@ -96,6 +128,7 @@ class MonitorPaciente:
         print('Crítico:', estados.count('CRITICO'))
         if 'CRITICO' in estados:
             print('Houve leitura CRÍTICA: a equipe deve reavaliar este paciente.')
+        print('Orientação para a última leitura:', self.recomendar(estados[-1]))
 
 
 def ler_numero(mensagem, minimo, maximo):
@@ -121,11 +154,10 @@ def ler_csv(nome_arquivo, paciente_id):
         leitor = csv.DictReader(arquivo)
         for linha in leitor:
             if linha['paciente_id'] == paciente_id:
-                print(f"Leitura {linha['leitura_numero']} "
-                      f"({linha['tempo_espera_min']} min de espera):")
                 monitor.registrar(int(linha['frequencia_cardiaca']),
                                   float(linha['spo2']),
-                                  float(linha['temperatura']))
+                                  float(linha['temperatura']),
+                                  prefixo=f"Leitura {linha['leitura_numero']:>2} ({linha['tempo_espera_min']:>3} min)")
 
     if len(monitor.historico) == 0:
         print('Nenhuma medição encontrada para esse paciente.')

@@ -7,15 +7,20 @@ Protótipo acadêmico: não faz diagnóstico.
 Escolha uma opção: 
 Cenário 1 - paciente estável
 Entrada: FC = 78 BPM, SpO2 = 98%, Temperatura = 36.6 °C
-FC: 78 BPM | SpO2: 98% | Temperatura: 36.6 °C | Estado: NORMAL -> Sinais dentro do esperado. Continue aguardando e avise a equipe se sentir algo diferente.
+FC: 78 BPM | SpO2: 98% | Temperatura: 36.6 °C | Estado: NORMAL
+Orientação: Sinais dentro do esperado. Continue aguardando e avise a equipe se sentir algo diferente.
 
 Cenário 2 - FC elevada, SpO2 um pouco baixa e temperatura alta
 Entrada: FC = 115 BPM, SpO2 = 93%, Temperatura = 37.9 °C
-FC: 115 BPM | SpO2: 93% | Temperatura: 37.9 °C | Estado: ATENCAO -> Sinais fora do esperado. Avise a equipe de enfermagem para uma reavaliação.
+FC: 115 BPM | SpO2: 93% | Temperatura: 37.9 °C | Estado: ATENCAO
+Motivo: FC alta, SpO2 baixa, temperatura alta
+Orientação: Sinais fora do esperado. Avise a equipe de enfermagem para uma reavaliação.
 
 Cenário 3 - FC muito alta, SpO2 baixa e febre
 Entrada: FC = 138 BPM, SpO2 = 88%, Temperatura = 39.2 °C
-FC: 138 BPM | SpO2: 88% | Temperatura: 39.2 °C | Estado: CRITICO -> Sinais preocupantes. Chame a enfermagem imediatamente ou peça ajuda a quem estiver perto.
+FC: 138 BPM | SpO2: 88% | Temperatura: 39.2 °C | Estado: CRITICO
+Motivo: FC muito alta, SpO2 muito baixa, temperatura muito alta
+Orientação: Sinais preocupantes. Chame a enfermagem imediatamente ou peça ajuda a quem estiver perto.
 
 --- Resumo do paciente DEMO ---
 Total de medições: 3
@@ -23,3 +28,4 @@ Normal: 1
 Atenção: 1
 Crítico: 1
 Houve leitura CRÍTICA: a equipe deve reavaliar este paciente.
+Orientação para a última leitura: Sinais preocupantes. Chame a enfermagem imediatamente ou peça ajuda a quem estiver perto.

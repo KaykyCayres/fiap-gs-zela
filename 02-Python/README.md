@@ -41,9 +41,9 @@ python monitor_pulseira.py
 
 | Opção do menu | O que faz |
 |---|---|
-| **1** · Ler do CSV | Pede o ID do paciente (1 a 102), classifica todas as leituras dele e mostra um resumo |
-| **2** · Digitar | Pede FC, SpO2 e temperatura, valida os valores e repete enquanto o usuário quiser |
-| **3** · Demonstração | Roda os 3 cenários de teste com valores fixos |
+| **1** · Ler do CSV | Pede o ID do paciente (1 a 102), classifica todas as leituras dele (uma linha por leitura, com o motivo) e mostra um resumo com a orientação |
+| **2** · Digitar | Pede FC, SpO2 e temperatura, valida os valores e repete enquanto o usuário quiser; mostra estado, motivo e orientação |
+| **3** · Demonstração | Roda os 3 cenários de teste com valores fixos, mostrando estado, motivo e orientação |
 
 Na opção 1, bons exemplos são o paciente **1** (sempre normal), o **25** (piora até atenção e melhora), o **4** (piora até crítico) e o **42**, cuja última leitura (FC 127, SpO2 97,2% e 39,1 °C) só fica CRÍTICA por causa da temperatura.
 
@@ -57,6 +57,8 @@ As entradas são **frequência cardíaca (FC, em BPM)**, **saturação de oxigê
 | 🟡 ATENÇÃO | `fc >= 110 or fc < 50 or spo2 < 95 or temp >= 37.8` | Sinais fora do esperado. Avise a equipe de enfermagem para uma reavaliação. |
 | 🟢 NORMAL | nenhuma das condições acima | Sinais dentro do esperado. Continue aguardando e avise a equipe se sentir algo diferente. |
 
+Além do estado, o programa diz **qual sinal causou o alerta** (método `motivos`), com as mesmas palavras da pulseira: `FC alta`, `FC muito alta`, `FC baixa`, `SpO2 baixa`, `SpO2 muito baixa`, `temperatura alta` e `temperatura muito alta`. Assim o paciente entende por que recebeu a orientação.
+
 A regra crítica é testada primeiro, para que o caso mais grave nunca seja classificado como um nível menor. Os limites ficam em constantes no início do código (`FC_ATENCAO`, `FC_CRITICO`, `FC_BAIXA`, `SPO2_ATENCAO`, `SPO2_CRITICO`, `TEMP_ATENCAO`, `TEMP_CRITICO`) e são os mesmos da pulseira (firmware) e do banco de dados.
 
 ## Requisitos do enunciado
@@ -66,17 +68,17 @@ A regra crítica é testada primeiro, para que o caso mais grave nunca seja clas
 - [x] **Variáveis, operadores, condicionais e laços:** `if / elif / else`, `while` na digitação e na validação, `for` na leitura do CSV, nos cenários e no resumo
 - [x] **Listas e dicionários:** `historico` é uma lista de dicionários; `RECOMENDACOES` é um dicionário
 - [x] **Funções:** `ler_numero`, `ler_csv`, `digitar_medicoes`, `demonstrar_cenarios` e `main`
-- [x] **Classe simples:** `MonitorPaciente`, com os atributos `paciente_id` e `historico` e os métodos `classificar`, `recomendar`, `registrar` e `resumo`
+- [x] **Classe simples:** `MonitorPaciente`, com os atributos `paciente_id` e `historico` e os métodos `classificar`, `motivos`, `recomendar`, `registrar` e `resumo`
 - [x] **3 cenários testados, com classificação e recomendação:** veja abaixo
 
 ## Testes realizados
 
 | Teste | Entrada | Resultado |
 |---|---|---|
-| 1 · Opção 3 | FC 78 / SpO2 98% / 36,6 °C · FC 115 / SpO2 93% / 37,9 °C · FC 138 / SpO2 88% / 39,2 °C | NORMAL, ATENÇÃO e CRÍTICO, cada um com a sua orientação |
-| 2 · Opção 1, paciente 4 | 36 leituras do CSV | Normal nas leituras 1 a 7, atenção de 8 a 18 e crítico de 19 a 36, com a temperatura subindo de 36,0 para 39,0 °C; o resumo conta 7 normais, 11 em atenção e 18 críticas e avisa que houve leitura crítica |
-| 3 · Opção 1, paciente 42 | 36 leituras do CSV | Normal nas leituras 1 a 14, atenção de 15 a 35 e crítico só na 36. Na leitura 15 a temperatura chega a 37,8 °C e o estado vira atenção mesmo com FC e SpO2 normais, e na 36 ela chega a 39,1 °C e vira crítico; o resumo conta 14 normais, 21 em atenção e 1 crítica |
-| 4 · Opção 2 | FC 999 (recusada); FC 100, SpO2 93% e temperatura 55 (recusada) e depois 36,8 °C; FC 80, SpO2 98% e 39,2 °C | 999 é recusado (fora da faixa de 20 a 250) e 55 °C também (faixa de 30 a 45); a leitura de 36,8 °C sai como ATENÇÃO; a última sai como CRÍTICO só pela temperatura |
+| 1 · Opção 3 | FC 78 / SpO2 98% / 36,6 °C · FC 115 / SpO2 93% / 37,9 °C · FC 138 / SpO2 88% / 39,2 °C | NORMAL, ATENÇÃO e CRÍTICO, cada um com o motivo (quando há) e a sua orientação |
+| 2 · Opção 1, paciente 4 | 36 leituras do CSV | Normal nas leituras 1 a 7, atenção de 8 a 18 (motivo: SpO2 baixa) e crítico de 19 a 36, com a temperatura subindo de 36,0 para 39,0 °C; cada linha mostra o motivo; o resumo conta 7 normais, 11 em atenção e 18 críticas, avisa que houve leitura crítica e mostra a orientação da última leitura |
+| 3 · Opção 1, paciente 42 | 36 leituras do CSV | Normal nas leituras 1 a 14, atenção de 15 a 35 e crítico só na 36. Na leitura 15 a temperatura chega a 37,8 °C e o estado vira atenção mesmo com FC e SpO2 normais (motivo: temperatura alta), e na 36 ela chega a 39,1 °C e vira crítico (motivo: temperatura muito alta); o resumo conta 14 normais, 21 em atenção e 1 crítica |
+| 4 · Opção 2 | FC 999 (recusada); FC 100, SpO2 93% e temperatura 55 (recusada) e depois 36,8 °C; FC 80, SpO2 98% e 39,2 °C | 999 é recusado (fora da faixa de 20 a 250) e 55 °C também (faixa de 30 a 45); a leitura de 36,8 °C sai como ATENÇÃO (motivo: SpO2 baixa); a última sai como CRÍTICO só pela temperatura (motivo: temperatura muito alta) |
 | 5 · Opção inválida e paciente inexistente | Opção 9 no menu; opção 1 com o paciente 999 | "Opção invalida." para a opção 9 e "Nenhuma medição encontrada para esse paciente." para o paciente 999 |
 
 Os prints de cada teste estão no documento de entrega (PDF).
