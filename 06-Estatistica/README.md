@@ -10,23 +10,26 @@
 
 ## O que é
 
-A Zela é uma pulseira que acompanha a frequência cardíaca (FC), a oxigenação (SpO2) e a temperatura de quem espera atendimento no pronto-socorro. Nesta parte, usamos estatística para entender como esses sinais se comportam em pessoas saudáveis e ver se os limites de alerta da pulseira fazem sentido.
+A Zela é uma pulseira que acompanha a frequência cardíaca (FC), a oxigenação (SpO2) e a temperatura de quem espera atendimento no pronto-socorro. Nesta parte, usamos estatística para entender como esses sinais se comportam em pessoas saudáveis e ver se os limites de alerta da pulseira fazem sentido. Analisamos os dados **reais** e os dados **simulados** e comparamos os resultados, como orientou o professor.
 
 ## Arquivos
 
 | Arquivo | O que é |
 |---|---|
 | `five_vital_signs_of_normal_people.csv` | Dados **reais** do Zenodo: 102 pessoas saudáveis, 9 leituras de cada sinal |
-| `medicoes_pulseira_simuladas.csv` | Dados **simulados** pelo grupo a partir dos reais (usados só para comparação) |
-| `analise_estatistica.R` | Código da análise |
+| `medicoes_pulseira_simuladas.csv` | Dados **simulados** pelo grupo a partir dos reais: 3.672 leituras, com perfis de piora e de recuperação |
+| `analise_estatistica.R` | Código da análise, com as duas bases e a comparação |
+| `zela_GS2026_statistical_computing_w_r_p.pdf` | Relatório estatístico (14 páginas), com tabelas, gráficos, interpretações e os prints do RStudio |
 
 ## O que o código faz
+
+O script analisa **as duas bases por completo** (dados reais e dados simulados, como orientou o professor) e depois compara os resultados. Para cada base:
 
 - Tabela de frequências da **FC** (quantitativa discreta) e da **temperatura** (quantitativa contínua)
 - Gráfico de barras da FC e histograma da temperatura
 - Média, mediana, moda, mínimo, máximo, amplitude, variância, desvio padrão, coeficiente de variação e quartis
-- Comparação entre dados reais e simulados
-- Teste das regras da pulseira em pessoas saudáveis (alarmes falsos)
+
+No final: tabela e boxplots **real × simulado** e o teste das regras da pulseira (alarmes) nas duas bases.
 
 ## Como rodar
 
@@ -42,7 +45,7 @@ A Zela é uma pulseira que acompanha a frequência cardíaca (FC), a oxigenaçã
 - **FC:** nenhuma leitura de pessoa saudável chegou a 110 BPM, então o limite de FC da pulseira não gera alarme falso.
 - **SpO2 e temperatura:** 5,7% e 7,0% das leituras de pessoas saudáveis disparariam um alerta.
 - **Temperatura:** é o sinal com mais ruído; varia mais dentro da mesma pessoa do que entre pessoas.
-- **Real × simulado:** a FC simulada é mais alta e mais espalhada que a real, porque inclui perfis de piora. A temperatura simulada tem dispersão parecida com a real (desvio padrão 1,07 e 1,09 °C), mas por outro motivo: na simulada ela vem dos perfis com febre, e na real vem do ruído de medição.
+- **Real × simulado:** a FC simulada é mais alta e mais espalhada que a real (CV de 19,28% contra 13,15%), porque inclui perfis de piora; 48,3% das leituras simuladas disparam algum alerta, contra 12,1% nas reais. A temperatura simulada tem dispersão parecida com a real (desvio padrão 1,07 e 1,09 °C), mas por outro motivo: na simulada ela vem dos perfis com febre, e na real vem do ruído de medição.
 - **Conclusão:** a pulseira deve confirmar a alteração em mais de uma leitura antes de alertar. O protótipo atual da Zela ainda alerta na primeira leitura fora da faixa, então essa confirmação é uma melhoria recomendada que ainda não foi implementada.
 
 O relatório completo, com tabelas, gráficos e interpretações, está no PDF de entrega.
