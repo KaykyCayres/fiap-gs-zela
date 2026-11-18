@@ -6,11 +6,12 @@
   Rafael Medici (RM 576249)
 
   O que e REAL no Wokwi (sensor simulado pelo Wokwi):
-    - Temperatura: DS18B20 (GPIO 4)
-    - Movimento:   MPU6050 (SDA 21 / SCL 22)
+    - Temperatura: DHT22 (GPIO 4)
   O que e SIMULADO por nos:
     - FC e SpO2: potenciometros (GPIO 34 e 35), no lugar do MAX30102,
-      que nao existe no Wokwi.
+      que nao existe no Wokwi e que nao temos no prototipo fisico.
+  Saida para o paciente:
+    - LEDs, buzzer e tela LCD 16x2 I2C (SDA 21 / SCL 22) com a orientacao.
 
   MODO DE TESTE: no Monitor Serial, comandos como "fc 125", "temp 39.1" ou "teste3"
   forcam valores para os testes. Sem comando, tudo vem dos sensores. Digite "ajuda".
@@ -19,11 +20,9 @@
   O dispositivo NAO faz diagnostico e NAO substitui a equipe de saude.
 */
 
-#include <OneWire.h>
-#include <DallasTemperature.h>
+#include <DHT.h>
 #include <Wire.h>
-#include <Adafruit_MPU6050.h>
-#include <Adafruit_Sensor.h>
+#include <LiquidCrystal_I2C.h>
 
 // ---------------- Pinos ----------------
 #define PINO_TEMP     4
@@ -45,28 +44,25 @@ const int SPO2_CRITICO = 90;
 // Temperatura lida pelo sensor (nao e temperatura corporal clinica).
 const float TEMP_ATENCAO = 37.8;
 const float TEMP_CRITICO = 39.0;
-// Movimento: quanto a aceleracao se afasta da gravidade (9,8 m/s2).
-// Acima disso o paciente esta se mexendo e a leitura pode nao ser confiavel.
-const float LIMITE_MOVIMENTO = 3.0;
 
 // Intervalo entre leituras: 2 segundos (justificativa no README/documento).
+// O DHT22 tambem so entrega uma leitura nova a cada 2 segundos.
 const unsigned long INTERVALO_MS = 2000;
 
-OneWire oneWire(PINO_TEMP);
-DallasTemperature sensorTemp(&oneWire);
-Adafruit_MPU6050 mpu;
+DHT dht(PINO_TEMP, DHT22);
+LiquidCrystal_I2C lcd(0x27, 16, 2);   // tela 16x2 no endereco I2C 0x27
 
 unsigned long ultimaLeitura = 0;
-bool mpuOk = false;
+float ultimaTemp = 36.5;          // ultima temperatura valida do DHT22
+String estadoNaTela = "";         // so reescreve a tela quando o estado muda
 
 // ---------------- Modo de teste (comandos pelo Monitor Serial) ----------------
 // Para os testes, da para forcar um valor digitando um comando no Monitor Serial.
 // Sem comando, a leitura vem dos sensores. A linha do Serial mostra a origem (FONTE).
-bool forcaFC = false, forcaSpO2 = false, forcaTemp = false, forcaMov = false;
+bool forcaFC = false, forcaSpO2 = false, forcaTemp = false;
 int valorFC = 0;
 int valorSpO2 = 0;
 float valorTemp = 0;
-float valorMov = 0;
 String comando = "";
 
 // ---------------- Funcoes ----------------
@@ -85,20 +81,9 @@ int lerSpO2() {
 
 float lerTemperatura() {
   if (forcaTemp) return valorTemp;
-  sensorTemp.requestTemperatures();
-  return sensorTemp.getTempCByIndex(0);
-}
-
-// Retorna o quanto a aceleracao total se afasta da gravidade (m/s2)
-float lerMovimento() {
-  if (forcaMov) return valorMov;
-  if (!mpuOk) return 0;
-  sensors_event_t a, g, t;
-  mpu.getEvent(&a, &g, &t);
-  float total = sqrt(a.acceleration.x * a.acceleration.x +
-                     a.acceleration.y * a.acceleration.y +
-                     a.acceleration.z * a.acceleration.z);
-  return fabs(total - 9.8);
+  float t = dht.readTemperature();
+  if (!isnan(t)) ultimaTemp = t;   // se a leitura falhar, usa a ultima valida
+  return ultimaTemp;
 }
 
 // Regras de classificacao: o caso mais grave e testado primeiro
@@ -141,48 +126,66 @@ String orientacao(String estado) {
   return "Continue aguardando";
 }
 
+// Orientacao da tela LCD: versao curta (16 caracteres por linha) da mesma
+// orientacao mostrada no programa em Python. A tela nao tem acentos.
+void mostrarNaTela(String estado) {
+  if (estado == estadoNaTela) return;   // evita a tela piscar a cada leitura
+  estadoNaTela = estado;
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  if (estado == "CRITICO") {
+    lcd.print("Chame enfermagem");
+    lcd.setCursor(0, 1);
+    lcd.print("JA ou peca ajuda");
+  } else if (estado == "ATENCAO") {
+    lcd.print("Sinais alterados");
+    lcd.setCursor(0, 1);
+    lcd.print("Avise enfermagem");
+  } else {
+    lcd.print("Aguarde e avise");
+    lcd.setCursor(0, 1);
+    lcd.print("se sentir algo");
+  }
+}
+
 // Diz de onde vieram os valores: dos sensores ou de um comando de teste
 String fonteDosValores() {
-  if (!forcaFC && !forcaSpO2 && !forcaTemp && !forcaMov) return "SENSOR";
+  if (!forcaFC && !forcaSpO2 && !forcaTemp) return "SENSOR";
   String lista = "";
   if (forcaFC)   lista += "FC,";
   if (forcaSpO2) lista += "SpO2,";
   if (forcaTemp) lista += "TEMP,";
-  if (forcaMov)  lista += "MOV,";
   lista.remove(lista.length() - 1);   // tira a ultima virgula
   return "TESTE(" + lista + ")";
 }
 
-// ---------------- Cenarios de teste: "teste1" a "teste7" ----------------
+// ---------------- Cenarios de teste: "teste1" a "teste6" ----------------
 // Cada teste tem etapas. "teste3" roda o teste inteiro, passando sozinho pelas etapas;
 // "teste3b" aplica so a etapa b; "proximo" passa para a etapa seguinte do teste em andamento.
 struct Etapa {
   int fc;
   int spo2;
   float temp;
-  float mov;
   const char* nome;
 };
 
-const Etapa TESTE_1[] = {{78, 98, 36.5, 0, "paciente estavel"}};
-const Etapa TESTE_2[] = {{104, 98, 36.5, 0, "FC 104 (normal)"},
-                         {125, 98, 36.5, 0, "FC 125 (alta)"}};
-const Etapa TESTE_3[] = {{78, 98, 36.5, 0, "SpO2 98 (normal)"},
-                         {78, 93, 36.5, 0, "SpO2 93 (baixa)"},
-                         {78, 85, 36.5, 0, "SpO2 85 (muito baixa)"}};
-const Etapa TESTE_4[] = {{125, 100, 36.5, 0, "FC 125 e SpO2 100"},
-                         {129, 100, 36.5, 0, "FC 129 (abaixo do limite critico)"},
-                         {129, 86, 36.5, 0, "FC 129 e SpO2 86"}};
-const Etapa TESTE_5[] = {{78, 98, 38.9, 0, "temperatura 38.9"},
-                         {78, 98, 38.0, 0, "temperatura 38.0"}};
-const Etapa TESTE_6[] = {{78, 98, 36.5, 0, "temperatura 36.5 (normal)"},
-                         {78, 98, 38.3, 0, "temperatura 38.3 (alta)"},
-                         {78, 98, 39.1, 0, "temperatura 39.1 (muito alta)"}};
-const Etapa TESTE_7[] = {{78, 98, 36.5, 0, "paciente parado"},
-                         {78, 98, 36.5, 4.1, "paciente se mexendo (MOV 4.1)"}};
+const Etapa TESTE_1[] = {{78, 98, 36.5, "paciente estavel"}};
+const Etapa TESTE_2[] = {{104, 98, 36.5, "FC 104 (normal)"},
+                         {125, 98, 36.5, "FC 125 (alta)"}};
+const Etapa TESTE_3[] = {{78, 98, 36.5, "SpO2 98 (normal)"},
+                         {78, 93, 36.5, "SpO2 93 (baixa)"},
+                         {78, 85, 36.5, "SpO2 85 (muito baixa)"}};
+const Etapa TESTE_4[] = {{125, 100, 36.5, "FC 125 e SpO2 100"},
+                         {129, 100, 36.5, "FC 129 (abaixo do limite critico)"},
+                         {129, 86, 36.5, "FC 129 e SpO2 86"}};
+const Etapa TESTE_5[] = {{78, 98, 38.9, "temperatura 38.9"},
+                         {78, 98, 38.0, "temperatura 38.0"}};
+const Etapa TESTE_6[] = {{78, 98, 36.5, "temperatura 36.5 (normal)"},
+                         {78, 98, 38.3, "temperatura 38.3 (alta)"},
+                         {78, 98, 39.1, "temperatura 39.1 (muito alta)"}};
 
-const Etapa* const CENARIOS[7] = {TESTE_1, TESTE_2, TESTE_3, TESTE_4, TESTE_5, TESTE_6, TESTE_7};
-const int TOTAL_ETAPAS[7] = {1, 2, 3, 3, 2, 3, 2};
+const Etapa* const CENARIOS[6] = {TESTE_1, TESTE_2, TESTE_3, TESTE_4, TESTE_5, TESTE_6};
+const int TOTAL_ETAPAS[6] = {1, 2, 3, 3, 2, 3};
 int cenarioAtual = 0;   // 0 = nenhum teste em andamento
 int etapaAtual = 0;
 const unsigned long TEMPO_ETAPA_MS = 6000;   // em "testeN", cada etapa dura 6 s (3 leituras)
@@ -192,11 +195,10 @@ unsigned long proximaEtapaEm = 0;
 // Forca todos os valores da etapa atual do teste atual
 void aplicarEtapa() {
   const Etapa &e = CENARIOS[cenarioAtual - 1][etapaAtual];
-  forcaFC = forcaSpO2 = forcaTemp = forcaMov = true;
+  forcaFC = forcaSpO2 = forcaTemp = true;
   valorFC = e.fc;
   valorSpO2 = e.spo2;
   valorTemp = e.temp;
-  valorMov = e.mov;
   int total = TOTAL_ETAPAS[cenarioAtual - 1];
   Serial.print("[teste] Teste "); Serial.print(cenarioAtual);
   Serial.print(" - etapa "); Serial.print(etapaAtual + 1);
@@ -217,9 +219,9 @@ void aplicarEtapa() {
 }
 
 void mostrarAjuda() {
-  Serial.println("[teste] Testes prontos: teste1 a teste7 (passam sozinhos pelas etapas) | teste3b (so uma etapa) | auto");
-  Serial.println("[teste] Valores soltos: fc 125 | spo2 85 | temp 39.1 | mov 4.1 | auto fc | ajuda");
-  Serial.println("[teste] 'auto' volta a ler os sensores. Faixas: FC 20-250, SpO2 50-100, TEMP 30-45, MOV 0-20");
+  Serial.println("[teste] Testes prontos: teste1 a teste6 (passam sozinhos pelas etapas) | teste3b (so uma etapa) | auto");
+  Serial.println("[teste] Valores soltos: fc 125 | spo2 85 | temp 39.1 | auto fc | ajuda");
+  Serial.println("[teste] 'auto' volta a ler os sensores. Faixas: FC 20-250, SpO2 50-100, TEMP 30-45");
 }
 
 // Trata um comando digitado no Monitor Serial
@@ -251,7 +253,7 @@ void processarComando(String c) {
       char letra = numero.charAt(numero.length() - 1);   // "3b" -> 'b'
       if (letra >= 'a' && letra <= 'c') { etapa = letra - 'a'; temLetra = true; }
     }
-    if (n >= 1 && n <= 7 && etapa < TOTAL_ETAPAS[n - 1]) {
+    if (n >= 1 && n <= 6 && etapa < TOTAL_ETAPAS[n - 1]) {
       cenarioAtual = n;
       etapaAtual = etapa;
       avancoAutomatico = !temLetra;   // sem letra: passa sozinho pelas etapas
@@ -265,11 +267,11 @@ void processarComando(String c) {
   // "proximo" (ou "p"): passa para a etapa seguinte do teste em andamento
   if (nome == "proximo" || nome == "p") {
     if (cenarioAtual == 0) {
-      Serial.println("[teste] Nenhum teste em andamento. Digite teste1 a teste7.");
+      Serial.println("[teste] Nenhum teste em andamento. Digite teste1 a teste6.");
     } else if (etapaAtual + 1 >= TOTAL_ETAPAS[cenarioAtual - 1]) {
       Serial.print("[teste] O teste "); Serial.print(cenarioAtual);
       Serial.print(" so tem "); Serial.print(TOTAL_ETAPAS[cenarioAtual - 1]);
-      Serial.print(" etapa(s) e ja esta na ultima. Digite 'auto' para voltar aos sensores ou outro teste (teste1 a teste7).");
+      Serial.print(" etapa(s) e ja esta na ultima. Digite 'auto' para voltar aos sensores ou outro teste (teste1 a teste6).");
       Serial.println();
     } else {
       avancoAutomatico = false;
@@ -281,14 +283,13 @@ void processarComando(String c) {
 
   if (nome == "auto") {
     if (resto == "" || resto == "tudo") {
-      forcaFC = forcaSpO2 = forcaTemp = forcaMov = false;
+      forcaFC = forcaSpO2 = forcaTemp = false;
       cenarioAtual = 0;
       avancoAutomatico = false;
       Serial.println("[teste] Todos os valores voltaram a vir dos sensores.");
     } else if (resto == "fc")   { forcaFC = false;   Serial.println("[teste] FC volta a vir do sensor."); }
     else if (resto == "spo2")   { forcaSpO2 = false; Serial.println("[teste] SpO2 volta a vir do sensor."); }
     else if (resto == "temp")   { forcaTemp = false; Serial.println("[teste] TEMP volta a vir do sensor."); }
-    else if (resto == "mov")    { forcaMov = false;  Serial.println("[teste] MOV volta a vir do sensor."); }
     else { Serial.print("[teste] Comando invalido: '"); Serial.print(c); Serial.println("'. Digite 'ajuda'."); return; }
     ultimaLeitura = millis() - INTERVALO_MS;   // faz uma leitura na hora
     return;
@@ -309,9 +310,6 @@ void processarComando(String c) {
   } else if (nome == "temp" && valor >= 30 && valor <= 45) {
     forcaTemp = true; valorTemp = valor;
     Serial.print("[teste] TEMP forcada em "); Serial.println(valorTemp, 1);
-  } else if (nome == "mov" && valor >= 0 && valor <= 20) {
-    forcaMov = true; valorMov = valor;
-    Serial.print("[teste] MOV forcado em "); Serial.println(valorMov, 1);
   } else {
     Serial.print("[teste] Comando ou valor invalido: '"); Serial.print(c); Serial.println("'. Digite 'ajuda'.");
     return;
@@ -344,14 +342,14 @@ void setup() {
   pinMode(LED_VERMELHO, OUTPUT);
   pinMode(PINO_BUZZER, OUTPUT);
 
-  sensorTemp.begin();
+  dht.begin();
   Wire.begin(21, 22);
-  mpuOk = mpu.begin();
+  lcd.init();
+  lcd.backlight();
 
   Serial.println("=== ZELA - pulseira de monitoramento ===");
   Serial.println("Prototipo academico: nao faz diagnostico.");
-  if (!mpuOk) Serial.println("Aviso: MPU6050 nao encontrado, movimento = 0.");
-  Serial.println("Formato: t | FC SpO2 TEMP MOV QUAL FONTE | ESTADO | motivo | orientacao");
+  Serial.println("Formato: t | FC SpO2 TEMP FONTE | ESTADO | motivo | orientacao");
   Serial.println("Modo de teste: digite 'ajuda' no Monitor Serial para ver os comandos.");
 }
 
@@ -371,8 +369,6 @@ void loop() {
     int fc = lerFC();
     int spo2 = lerSpO2();
     float temp = lerTemperatura();
-    float mov = lerMovimento();
-    String qualidade = (mov > LIMITE_MOVIMENTO) ? "INSTAVEL" : "OK";
 
     String motivo;
     String estado = classificar(fc, spo2, temp, motivo);
@@ -383,18 +379,14 @@ void loop() {
     Serial.print("FC="); Serial.print(fc);
     Serial.print(" SpO2="); Serial.print(spo2);
     Serial.print(" TEMP="); Serial.print(temp, 1);
-    Serial.print(" MOV="); Serial.print(mov, 1);
-    Serial.print(" QUAL="); Serial.print(qualidade);
     Serial.print(" FONTE="); Serial.print(fonteDosValores());
     Serial.print(" | ESTADO="); Serial.print(estado);
     Serial.print(" | motivo: "); Serial.print(motivo);
     Serial.print(" | "); Serial.println(orientacao(estado));
 
-    if (qualidade == "INSTAVEL") {
-      Serial.println("   -> Movimento detectado: fique parado para uma leitura confiavel.");
-    }
-     // LEDs e buzzer depois de imprimir, para nenhum aviso interno do ESP32
+     // LEDs, buzzer e tela depois de imprimir, para nenhum aviso interno do ESP32
     // aparecer no meio da linha do Serial
     alertar(estado);
+    mostrarNaTela(estado);
   }
 }
